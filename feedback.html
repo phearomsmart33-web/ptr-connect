@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Website Feedback | PTR Connect</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body class="policy-page">
+    <header class="policy-header">
+      <a class="brand" href="./index.html">
+        <span class="brand-mark">PTR</span>
+        <span><strong>PTR Connect</strong><small>Travel | Business | Investment</small></span>
+      </a>
+      <a class="policy-home" href="./index.html">Back to Home</a>
+    </header>
+    <main class="policy-shell feedback-shell">
+      <p class="eyebrow">Website Feedback</p>
+      <h1>Help us review the website experience.</h1>
+      <p class="policy-lead">
+        Please review the website on your phone or computer and share whether the booking,
+        invoice, payment, and service process feels clear and trustworthy.
+      </p>
+
+      <form class="feedback-form" action="#" method="post">
+        <label>
+          Your name
+          <input type="text" name="reviewer_name" placeholder="Reviewer name" />
+        </label>
+        <label>
+          Country / city
+          <input type="text" name="reviewer_location" placeholder="Cambodia, Singapore, USA..." />
+        </label>
+        <label>
+          Device used
+          <select name="device">
+            <option>Mobile phone</option>
+            <option>Tablet</option>
+            <option>Laptop / desktop</option>
+          </select>
+        </label>
+        <label>
+          Is the service purpose clear?
+          <select name="service_clarity">
+            <option>Yes, clear</option>
+            <option>Mostly clear</option>
+            <option>Not clear</option>
+          </select>
+        </label>
+        <label>
+          Is the payment flow easy to understand?
+          <select name="payment_clarity">
+            <option>Yes, clear</option>
+            <option>Mostly clear</option>
+            <option>Not clear</option>
+          </select>
+        </label>
+        <label>
+          Does the website feel safe and professional?
+          <select name="trust_level">
+            <option>Yes, professional</option>
+            <option>Acceptable</option>
+            <option>Needs improvement</option>
+          </select>
+        </label>
+        <label>
+          What should be improved?
+          <textarea name="comments" rows="6" placeholder="Design, wording, payment trust, mobile layout, missing information..."></textarea>
+        </label>
+        <button class="button primary full" type="submit">Prepare Feedback Summary</button>
+        <div class="request-status" id="feedbackStatus" role="status" aria-live="polite">
+          Feedback will be prepared on this device. For live collection, connect this form to Google Forms, Tally, Netlify Forms, or a backend endpoint.
+        </div>
+      </form>
+    </main>
+    <script src="./app.js"></script>
+  </body>
+</html>

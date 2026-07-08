@@ -1,0 +1,384 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>PTR Connect | Travel, Business & Investment Coordination</title>
+    <meta
+      name="description"
+      content="PTR Connect provides travel, business, investment, and transportation coordination with itemized invoices and secure hosted checkout readiness."
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header class="site-header" aria-label="Main navigation">
+      <a class="brand" href="#top" aria-label="PTR Connect home">
+        <span class="brand-mark">PTR</span>
+        <span>
+          <strong>PTR Connect</strong>
+          <small>Travel | Business | Investment</small>
+        </span>
+      </a>
+      <nav class="nav-links" aria-label="Primary">
+        <a href="#estimate">Fees</a>
+        <a href="#process">Process</a>
+        <a href="./aml-kyc.html">AML/KYC</a>
+        <a href="#request">Request</a>
+        <a href="./feedback.html">Feedback</a>
+      </nav>
+    </header>
+
+    <main id="top">
+      <section class="hero" aria-label="Premium Cambodia booking and coordination">
+        <img src="./assets/hero-concierge.png" alt="Premium hotel concierge and secure booking atmosphere" />
+        <div class="hero-shade"></div>
+        <div class="hero-content">
+          <p class="eyebrow">Connecting Global Opportunities</p>
+          <h1>PTR Connect coordination desk.</h1>
+          <p class="hero-copy">
+            Travel, business, investment, and transport support with itemized invoices and secure
+            payment flow before service starts.
+          </p>
+          <div class="hero-actions">
+            <a class="button primary" href="#request">Submit Booking Details</a>
+            <a class="button secondary" href="#request">Confirm to Pay</a>
+          </div>
+        </div>
+      </section>
+
+      <section class="booking-dashboard" aria-label="Booking dashboard">
+        <div class="dashboard-hero">
+          <p class="eyebrow">PTR Connect Desk</p>
+          <h2>Find and arrange your next Cambodia stay, tour, transport, or business service.</h2>
+          <p>Search the request details first. We confirm supplier availability before payment.</p>
+          <form class="booking-search" action="#request">
+            <label>
+              Destination or service
+              <input name="quick_destination" type="text" placeholder="Phnom Penh, Siem Reap, hotel, tour..." />
+            </label>
+            <label>
+              Start date
+              <input name="quick_start_date" type="date" />
+            </label>
+            <label>
+              Duration
+              <input name="quick_duration" type="text" placeholder="7 days / 1 month" />
+            </label>
+            <label>
+              Guests / rooms
+              <input name="quick_guests" type="text" placeholder="2 adults, 1 room" />
+            </label>
+            <button class="button primary" type="submit">Submit Details</button>
+          </form>
+        </div>
+
+        <div class="dashboard-block">
+          <div class="dashboard-title">
+            <h3>Popular Cambodia Areas</h3>
+            <a href="#request">Request another area</a>
+          </div>
+          <div class="destination-row">
+            <article>
+              <img src="./assets/hero-concierge.png" alt="Phnom Penh premium city booking atmosphere" />
+              <strong>Phnom Penh</strong>
+              <span>Hotels, meetings, local support</span>
+            </article>
+            <article>
+              <img src="./assets/cambodia-tour.png" alt="Siem Reap and Cambodia landmark tour route" />
+              <strong>Siem Reap</strong>
+              <span>Heritage tours and premium stays</span>
+            </article>
+            <article>
+              <img src="./assets/tour-food-river.png" alt="Cambodia riverside dining and travel experience" />
+              <strong>Kampot</strong>
+              <span>River stays and private trips</span>
+            </article>
+            <article>
+              <img src="./assets/tour-boat-cruise.png" alt="Cambodia coastal and river cruise experience" />
+              <strong>Kep</strong>
+              <span>Coastal booking coordination</span>
+            </article>
+            <article>
+              <img src="./assets/tour-city-van.png" alt="Private city van tour and countryside route" />
+              <strong>Battambang</strong>
+              <span>Cultural route arrangements</span>
+            </article>
+          </div>
+        </div>
+
+        <div class="dashboard-block activities-block">
+          <div class="dashboard-title">
+            <div>
+              <h3>Popular Things To Do</h3>
+              <p>Tourist packages arranged through selected local suppliers.</p>
+            </div>
+            <a href="#estimate">View service fees</a>
+          </div>
+          <div class="activity-tabs" aria-label="Tour package categories">
+            <button type="button" class="active" data-category="all">All packages</button>
+            <button type="button" data-category="culture">Cultural tours</button>
+            <button type="button" data-category="transport">Private car tours</button>
+            <button type="button" data-category="food">Food experiences</button>
+            <button type="button" data-category="cruise">Boat cruises</button>
+            <button type="button" data-category="custom">Custom package</button>
+          </div>
+          <div class="activity-row">
+            <article data-category="culture">
+              <img src="./assets/tour-cultural.png" alt="Original Cambodia cultural museum and heritage tour visual" />
+              <span class="badge">Popular</span>
+              <div>
+                <strong>Phnom Penh Cultural Heritage Tour</strong>
+                <small>Phnom Penh</small>
+                <p><b>4.8</b> Excellent - Guided supplier arrangement</p>
+                <footer><span>From</span><b>$180</b></footer>
+                <em>Free cancellation review before supplier confirmation</em>
+              </div>
+            </article>
+            <article data-category="transport">
+              <img src="./assets/tour-city-van.png" alt="Original private van city tour visual" />
+              <span class="badge">Private</span>
+              <div>
+                <strong>Private City Tour With Driver & Guide</strong>
+                <small>Phnom Penh and nearby areas</small>
+                <p><b>4.9</b> Excellent - Vehicle and guide coordination</p>
+                <footer><span>From</span><b>$320</b></footer>
+                <em>Invoice approved before secure payment link</em>
+              </div>
+            </article>
+            <article data-category="food">
+              <img src="./assets/tour-food-river.png" alt="Original Cambodia food and riverside evening experience visual" />
+              <div>
+                <strong>Food & Riverside Evening Experience</strong>
+                <small>Phnom Penh riverside</small>
+                <p><b>4.7</b> Excellent - Local dining coordination</p>
+                <footer><span>From</span><b>$95</b></footer>
+                <em>Supplier cost and agency fee itemized</em>
+              </div>
+            </article>
+            <article data-category="cruise">
+              <img src="./assets/tour-boat-cruise.png" alt="Original Cambodia boat cruise and sunset river tour visual" />
+              <span class="badge">Scenic</span>
+              <div>
+                <strong>Sunset River Cruise Arrangement</strong>
+                <small>Private or small group</small>
+                <p><b>4.8</b> Excellent - Boat supplier confirmation</p>
+                <footer><span>From</span><b>$140</b></footer>
+                <em>Receipt issued before service starts</em>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="trust-band" aria-label="Operating principles">
+        <div>
+          <strong>Itemized Invoice First</strong>
+          <span>Supplier cost and agency service fee shown clearly</span>
+        </div>
+        <div>
+          <strong>Visa / Mastercard</strong>
+          <span>Full approved invoice paid before booking release</span>
+        </div>
+        <div>
+          <strong>AML / KYC Procedure</strong>
+          <span>Customer verification and record keeping applied</span>
+        </div>
+      </section>
+
+      <section id="process" class="section process-section">
+        <div class="section-heading narrow">
+          <p class="eyebrow">Service Delivery Flow</p>
+          <h2>Service Payment Flow.</h2>
+        </div>
+        <div class="flow">
+          <article>
+            <span>01</span>
+            <h3>Customer Request</h3>
+            <p>Customer submits service details, travel dates, quantity, destination, or case requirements.</p>
+          </article>
+          <article>
+            <span>02</span>
+            <h3>Supplier Check</h3>
+            <p>Supplier availability, service scope, delivery timing, and price are confirmed.</p>
+          </article>
+          <article>
+            <span>03</span>
+            <h3>Invoice Issued</h3>
+            <p>An itemized invoice shows supplier cost, agency fee, terms, and refund conditions.</p>
+          </article>
+          <article>
+            <span>04</span>
+            <h3>Approval & Payment</h3>
+            <p>Customer approves the invoice and pays through a secure hosted checkout or approved payment link.</p>
+          </article>
+          <article>
+            <span>05</span>
+            <h3>Service Processing</h3>
+            <p>Booking, supplier work, transport arrangement, tour coordination, or goods dispatch begins.</p>
+          </article>
+          <article>
+            <span>06</span>
+            <h3>Delivery & Receipt</h3>
+            <p>Customer receives confirmation, receipt, booking proof, delivery proof, or service completion record.</p>
+          </article>
+        </div>
+      </section>
+
+      <section id="estimate" class="section calculator-section" aria-label="Booking estimate calculator">
+        <div class="section-heading narrow">
+          <p class="eyebrow">Quick Estimate</p>
+            <h2>Prepare a clean customer invoice estimate.</h2>
+        </div>
+        <div class="estimator">
+          <label>
+            Service
+            <select id="serviceSelect">
+              <option value="hotel">5-Star Hotel Booking - $700/night</option>
+              <option value="transport">Private Transportation - $180/day estimate</option>
+              <option value="tour">Cambodia Tour Package - $2,500/package</option>
+              <option value="business">Business & Local Legal Coordination - $20,000/case</option>
+            </select>
+          </label>
+          <label id="quantityLabel">
+            Nights
+            <input id="quantityInput" type="number" min="1" value="1" />
+          </label>
+          <div class="estimate-result">
+            <span>Estimated full invoice</span>
+            <strong id="estimateValue">$700</strong>
+            <small>Final invoice should itemize supplier cost and agency service fee.</small>
+          </div>
+        </div>
+      </section>
+
+      <section id="request" class="section request-section">
+        <div class="request-copy">
+          <p class="eyebrow">Booking Request</p>
+          <h2>Send booking details for review.</h2>
+          <p>
+            Submit the service type, date, duration, and special requirements. We review the request,
+            confirm supplier availability, and prepare the itemized invoice before payment.
+          </p>
+          <div class="login-panel" aria-label="Customer account login">
+            <strong>Login required before booking</strong>
+            <p>Use your Google account name or email to unlock the booking request.</p>
+            <form class="login-form" action="#" method="post">
+              <input type="email" name="login_email" placeholder="Google account email" required />
+              <button class="button secondary full" type="submit">Login with Google Account</button>
+            </form>
+            <div class="request-status" id="loginStatus" role="status" aria-live="polite">
+              Please login first to process booking.
+            </div>
+          </div>
+        </div>
+        <form class="request-form" action="#" method="post">
+          <label>
+            Full name
+            <input type="text" name="name" placeholder="Customer full name" required />
+          </label>
+          <label>
+            Email or WhatsApp
+            <input type="text" name="contact" placeholder="contact@example.com / +855..." required />
+          </label>
+          <label>
+            Requested service
+            <select name="service" id="requestService" required>
+              <option value="hotel">5-Star Hotel Booking</option>
+              <option value="transport">Private Transportation</option>
+              <option value="tour">Cambodia Tour Package</option>
+              <option value="business">Business & Local Legal Coordination</option>
+            </select>
+          </label>
+          <div class="form-pair">
+            <label>
+              Start date
+              <input type="date" name="start_date" required />
+            </label>
+            <label>
+              Duration
+              <input type="text" name="duration" placeholder="Example: 7 days / 1 month" required />
+            </label>
+          </div>
+          <div class="form-pair">
+            <label>
+              Guests / rooms / cases
+              <input type="number" name="quantity" min="1" placeholder="Example: 10" required />
+            </label>
+            <label>
+              Destination / area
+              <input type="text" name="destination" placeholder="Phnom Penh, Siem Reap..." />
+            </label>
+          </div>
+          <label>
+            Request details
+            <textarea name="details" rows="5" placeholder="Travel dates, number of persons, case summary, or special requirements"></textarea>
+          </label>
+          <button class="button primary full" type="submit">Record Booking Details</button>
+          <button class="button secondary full" id="invoiceReviewButton" type="button" hidden>Invoice Review</button>
+          <div class="request-status" id="requestStatus" role="status" aria-live="polite">
+            Login first, then record booking details for invoice review before payment.
+          </div>
+          <article class="invoice-review-panel" id="invoiceReviewPanel" aria-label="Full invoice review" hidden>
+            <div class="summary-top">
+              <strong>Invoice Review</strong>
+              <small id="invoiceReference">Pending record</small>
+            </div>
+            <dl>
+              <div><dt>Customer</dt><dd id="invoiceCustomer">-</dd></div>
+              <div><dt>Contact</dt><dd id="invoiceContact">-</dd></div>
+              <div><dt>Service</dt><dd id="summaryService">5-Star Hotel Booking</dd></div>
+              <div><dt>Start / duration</dt><dd id="invoiceSchedule">-</dd></div>
+              <div><dt>Destination</dt><dd id="invoiceDestination">-</dd></div>
+              <div><dt>Supplier cost</dt><dd id="summarySupplier">$700</dd></div>
+              <div><dt>Agency fee</dt><dd id="summaryFee">$70</dd></div>
+              <div class="total"><dt>Total amount</dt><dd id="summaryTotal">$770</dd></div>
+            </dl>
+            <div class="invoice-conditions">
+              <strong>Invoice conditions</strong>
+              <p>Payment is requested only after invoice review. Supplier booking or service work proceeds after payment approval. Live card details must be entered only on the approved payment gateway.</p>
+            </div>
+            <a class="button secondary full" id="whatsAppNotifyButton" href="#" target="_blank" rel="noopener" hidden>Notify Admin via WhatsApp</a>
+            <button class="button primary full" id="payNowButton" type="button" hidden>Checkout / Pay Now</button>
+          </article>
+          <p class="form-note">
+            No payment is collected from this form. Payment is requested only after invoice approval;
+            supplier booking or service work proceeds after Visa or Mastercard payment is approved.
+          </p>
+        </form>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="footer-brand">
+        <strong>PTR Connect</strong>
+        <span>Travel | Business | Investment. Connecting Global Opportunities with itemized invoices, secure hosted checkout readiness, and AML/KYC procedures.</span>
+      </div>
+      <div class="footer-columns">
+        <nav aria-label="About PTR Connect">
+          <h3>About</h3>
+          <a href="#estimate">What we sell</a>
+          <a href="#process">How booking works</a>
+          <a href="#request">Confirm to Pay</a>
+          <a href="./contact.html">Corporate contact</a>
+        </nav>
+        <nav aria-label="Terms and settings">
+          <h3>Terms and settings</h3>
+          <a href="./privacy.html">Privacy Notice</a>
+          <a href="./terms.html">Terms of Service</a>
+          <a href="./refund-policy.html">Refund Policy</a>
+          <a href="./payment-policy.html">Payment Policy</a>
+          <a href="./aml-kyc.html">AML / KYC Procedure</a>
+        </nav>
+        <nav aria-label="Customer support">
+          <h3>Support</h3>
+          <a href="#request">Booking request</a>
+          <a href="#request">Confirm to Pay</a>
+          <a href="./feedback.html">Website feedback</a>
+          <a href="./contact.html">Contact support</a>
+        </nav>
+      </div>
+    </footer>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
