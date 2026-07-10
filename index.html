@@ -3,10 +3,10 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>PTR Connect | Travel, Business & Investment Coordination</title>
+    <title>RTP Connect | Travel, Business & Investment Coordination</title>
     <meta
       name="description"
-      content="PTR Connect provides travel, business, investment, and transportation coordination with itemized invoices and secure hosted checkout readiness."
+      content="RTP Connect provides travel, business, investment, and transportation coordination with itemized invoices and secure hosted checkout readiness."
     />
     <style>
 :root {
@@ -966,6 +966,75 @@ h3 {
   font: inherit;
 }
 
+.service-options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px 14px;
+  margin: 0;
+  padding: 14px;
+  border: 1px solid rgba(17, 21, 19, 0.14);
+  background: #fffaf0;
+}
+
+.service-options legend {
+  padding: 0 6px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.service-options label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.service-options input {
+  width: 16px;
+  min-height: 16px;
+  height: 16px;
+  padding: 0;
+  accent-color: var(--gold);
+}
+
+.official-invoice-header {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 16px;
+  margin: 16px 0;
+  padding: 16px;
+  border: 1px solid rgba(17, 21, 19, 0.14);
+  background: #fffaf0;
+}
+
+.official-invoice-header strong {
+  display: block;
+  font-size: 18px;
+}
+
+.official-invoice-header span,
+.official-invoice-header small {
+  display: block;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.invoice-meta {
+  text-align: right;
+}
+
+.invoice-meta b {
+  display: block;
+  color: var(--gold);
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
 .card-field-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -1541,14 +1610,20 @@ input:disabled {
   }
 }
 
+@media (max-width: 720px) {
+  .service-options {
+    grid-template-columns: 1fr;
+  }
+}
+
 </style>
   </head>
   <body>
     <header class="site-header" aria-label="Main navigation">
-      <a class="brand" href="#top" aria-label="PTR Connect home">
-        <span class="brand-mark">PTR</span>
+      <a class="brand" href="#top" aria-label="RTP Connect home">
+        <span class="brand-mark">RTP</span>
         <span>
-          <strong>PTR Connect</strong>
+          <strong>RTP Connect</strong>
           <small>Travel | Business | Investment</small>
         </span>
       </a>
@@ -1567,7 +1642,7 @@ input:disabled {
         <div class="hero-shade"></div>
         <div class="hero-content">
           <p class="eyebrow">Connecting Global Opportunities</p>
-          <h1>PTR Connect coordination desk.</h1>
+          <h1>RTP Connect coordination desk.</h1>
           <p class="hero-copy">
             Travel, business, investment, and transport support with itemized invoices and secure
             payment flow before service starts.
@@ -1581,7 +1656,7 @@ input:disabled {
 
       <section class="booking-dashboard" aria-label="Booking dashboard">
         <div class="dashboard-hero">
-          <p class="eyebrow">PTR Connect Desk</p>
+          <p class="eyebrow">RTP Connect Desk</p>
           <h2>Find and arrange your next Cambodia stay, tour, transport, or business service.</h2>
           <p>Search the request details first. We confirm supplier availability before payment.</p>
           <form class="booking-search" action="#request">
@@ -1822,6 +1897,13 @@ input:disabled {
               <option value="business">Business & Local Legal Coordination</option>
             </select>
           </label>
+          <fieldset class="service-options" aria-label="Additional services">
+            <legend>Additional services</legend>
+            <label><input type="checkbox" name="extra_service" value="hotel" /> 5-Star Hotel Booking</label>
+            <label><input type="checkbox" name="extra_service" value="transport" /> Private Transportation</label>
+            <label><input type="checkbox" name="extra_service" value="tour" /> Cambodia Tour Package</label>
+            <label><input type="checkbox" name="extra_service" value="business" /> Business & Local Legal Coordination</label>
+          </fieldset>
           <div class="form-pair">
             <label>
               Start date
@@ -1853,15 +1935,29 @@ input:disabled {
           </div>
           <article class="invoice-review-panel" id="invoiceReviewPanel" aria-label="Full invoice review" hidden>
             <div class="summary-top">
-              <strong>Invoice Review</strong>
+              <strong>Official Invoice Review</strong>
               <small id="invoiceReference">Pending record</small>
+            </div>
+            <div class="official-invoice-header">
+              <div>
+                <strong>RTP Connect Service Invoice</strong>
+                <span>Issued for customer review after booking details are recorded.</span>
+                <small>Legal operator support: PRATHNA KASEKOR KHMER IMPORT EXPORT CO., LTD.</small>
+              </div>
+              <div class="invoice-meta">
+                <b>Invoice status</b>
+                <span>Pending customer approval</span>
+                <small>Payment due after approval</small>
+              </div>
             </div>
             <dl>
               <div><dt>Customer</dt><dd id="invoiceCustomer">-</dd></div>
               <div><dt>Contact</dt><dd id="invoiceContact">-</dd></div>
               <div><dt>Service</dt><dd id="summaryService">5-Star Hotel Booking</dd></div>
+              <div><dt>Invoice date</dt><dd id="invoiceDate">-</dd></div>
               <div><dt>Start / duration</dt><dd id="invoiceSchedule">-</dd></div>
               <div><dt>Destination</dt><dd id="invoiceDestination">-</dd></div>
+              <div><dt>Payment terms</dt><dd>Due after customer approval</dd></div>
               <div><dt>Supplier cost</dt><dd id="summarySupplier">$700</dd></div>
               <div><dt>Agency fee</dt><dd id="summaryFee">$70</dd></div>
               <div class="total"><dt>Total amount</dt><dd id="summaryTotal">$770</dd></div>
@@ -1871,10 +1967,10 @@ input:disabled {
               <p>Payment is requested only after invoice review. Supplier booking or service work proceeds after payment approval. Live card details must be entered only on the approved payment gateway.</p>
             </div>
             <a class="button secondary full" id="whatsAppNotifyButton" href="#" target="_blank" rel="noopener" hidden>Notify Admin via WhatsApp</a>
-            <button class="button primary full" id="payNowButton" type="button" hidden>Checkout / Pay Now</button>
-            <div class="card-payment-panel" id="cardPaymentPanel" aria-label="Card payment preview" hidden>
+            <button class="button primary full" id="payNowButton" type="button" hidden>Pay Now</button>
+            <div class="card-payment-panel" id="cardPaymentPanel" aria-label="Pay Now card payment form" hidden>
               <div class="summary-top">
-                <h3>Debit or credit card</h3>
+                <h3>Pay Now</h3>
                 <div class="card-brands" aria-label="Accepted card brands">
                   <span class="brand-pill">VISA</span>
                   <span class="brand-pill mastercard">Mastercard</span>
@@ -1908,8 +2004,8 @@ input:disabled {
                   <option>Other</option>
                 </select>
               </label>
-              <p class="card-demo-warning">Demo preview only. In live operation, card data must be entered on the approved payment provider page or secure iframe, with 3DS authentication enabled where required.</p>
-              <button class="button primary full" id="confirmDemoCardButton" type="button">Confirm Card Preview</button>
+              <p class="card-demo-warning">Payment form preview only. In live operation, card data must be entered on the approved payment provider page or secure iframe, with 3DS authentication enabled where required.</p>
+              <button class="button primary full" id="confirmDemoCardButton" type="button">Confirm Pay Now</button>
             </div>
           </article>
           <p class="form-note">
@@ -1918,7 +2014,7 @@ input:disabled {
           </p>
         </form>
       </section>
-          <section id="policy-summary" class="info-section" aria-label="Policy summary">
+      <section id="policy-summary" class="info-section" aria-label="Policy summary">
         <div class="section-copy narrow">
           <p class="eyebrow">Policy Summary</p>
           <h2>Clear invoice, refund, privacy, and payment terms before checkout.</h2>
@@ -1926,10 +2022,40 @@ input:disabled {
         </div>
       </section>
 
+      <section id="company" class="info-section" aria-label="Company information">
+        <div class="section-copy narrow">
+          <p class="eyebrow">Company Information</p>
+          <h2>RTP Connect is presented with registered company support for travel agency activity.</h2>
+          <p>
+            RTP Connect is operated for booking coordination, travel support, transport arrangements,
+            business service coordination, and invoice-based customer payment handling under the
+            registered company profile below.
+          </p>
+        </div>
+        <div class="safety-grid">
+          <article>
+            <strong>Registered Company</strong>
+            <p>PRATHNA KASEKOR KHMER IMPORT EXPORT CO., LTD.</p>
+          </article>
+          <article>
+            <strong>Legal Form</strong>
+            <p>Private Limited Company, incorporated in Cambodia on 19 May 2025.</p>
+          </article>
+          <article>
+            <strong>Registered Activity</strong>
+            <p>Main business activity recorded as Travel Agency for tax registration review.</p>
+          </article>
+          <article>
+            <strong>Tax Registration</strong>
+            <p>Registered with the General Department of Taxation from 20 May 2025. Full certificates are available for bank or payment processor review.</p>
+          </article>
+        </div>
+      </section>
+
       <section id="contact" class="info-section" aria-label="Contact support">
         <div class="section-copy narrow">
           <p class="eyebrow">Contact</p>
-          <h2>PTR Connect support is available for booking and invoice review.</h2>
+          <h2>RTP Connect support is available for booking and invoice review.</h2>
           <p>For customer support, use the booking request form and WhatsApp notification flow after invoice review.</p>
         </div>
       </section>
@@ -1937,12 +2063,13 @@ input:disabled {
 
     <footer class="site-footer">
       <div class="footer-brand">
-        <strong>PTR Connect</strong>
-        <span>Travel | Business | Investment. Connecting Global Opportunities with itemized invoices, secure hosted checkout readiness, and AML/KYC procedures.</span>
+        <strong>RTP Connect</strong>
+        <span>Travel | Business | Investment. Operated with registered company support, itemized invoices, secure checkout readiness, and AML/KYC procedures.</span>
       </div>
       <div class="footer-columns">
-        <nav aria-label="About PTR Connect">
+        <nav aria-label="About RTP Connect">
           <h3>About</h3>
+          <a href="#company">Company information</a>
           <a href="#estimate">What we sell</a>
           <a href="#process">How booking works</a>
           <a href="#request">Confirm to Pay</a>
@@ -1990,6 +2117,7 @@ const invoiceReviewPanel = document.querySelector("#invoiceReviewPanel");
 const invoiceReference = document.querySelector("#invoiceReference");
 const invoiceCustomer = document.querySelector("#invoiceCustomer");
 const invoiceContact = document.querySelector("#invoiceContact");
+const invoiceDate = document.querySelector("#invoiceDate");
 const invoiceSchedule = document.querySelector("#invoiceSchedule");
 const invoiceDestination = document.querySelector("#invoiceDestination");
 const whatsAppNotifyButton = document.querySelector("#whatsAppNotifyButton");
@@ -2087,6 +2215,11 @@ function inferServiceFromText(text) {
   return "hotel";
 }
 
+function getSelectedServiceNames(primaryService, extraServices = []) {
+  const unique = [primaryService, ...extraServices].filter(Boolean).filter((value, index, list) => list.indexOf(value) === index);
+  return unique.map((value) => services[value]?.name).filter(Boolean);
+}
+
 serviceSelect.addEventListener("change", () => {
   quantityInput.value = "1";
   updateEstimate();
@@ -2129,7 +2262,7 @@ function setBookingFormLocked(locked) {
 
 function getSavedLogin() {
   try {
-    return JSON.parse(localStorage.getItem("ptrConnectLogin") || "null");
+    return JSON.parse(localStorage.getItem("rtpConnectLogin") || "null");
   } catch {
     return null;
   }
@@ -2159,7 +2292,7 @@ if (loginForm) {
     const email = String(formData.get("login_email") || "").trim();
     if (!email) return;
 
-    localStorage.setItem("ptrConnectLogin", JSON.stringify({
+    localStorage.setItem("rtpConnectLogin", JSON.stringify({
       email,
       loggedInAt: new Date().toISOString()
     }));
@@ -2190,18 +2323,18 @@ document.querySelectorAll(".activity-tabs button").forEach((button) => {
 if (hostedCheckoutButton) {
   hostedCheckoutButton.addEventListener("click", () => {
     const invoice = getCurrentInvoice();
-    const demoReference = `PTR-${Date.now().toString().slice(-6)}`;
+    const demoReference = `RTP-${Date.now().toString().slice(-6)}`;
     const checkoutPayload = {
       reference: demoReference,
       service: invoice.selected.name,
       supplierCost: invoice.supplierCost,
       agencyFee: invoice.agencyFee,
       total: invoice.total,
-      provider: "Secure hosted checkout preview"
+      provider: "Secure Pay Now provider preview"
     };
 
     localStorage.setItem("latestCheckoutPreview", JSON.stringify(checkoutPayload));
-    checkoutStatus.textContent = `Checkout request prepared: ${demoReference}. Review the gateway checkout preview below, then continue to the approved provider setup for ${money.format(invoice.total)}.`;
+    checkoutStatus.textContent = `Pay Now request prepared: ${demoReference}. Review the approved provider setup for ${money.format(invoice.total)}.`;
     checkoutStatus.classList.add("success");
     if (checkoutPreviewForm) {
       checkoutPreviewForm.hidden = false;
@@ -2223,6 +2356,7 @@ if (requestForm) {
 
     const formData = new FormData(requestForm);
     const service = formData.get("service");
+    const extraServices = formData.getAll("extra_service").filter((value) => value !== service);
     const quantity = Number.parseInt(formData.get("quantity"), 10) || 1;
 
     if (services[service]) {
@@ -2237,6 +2371,8 @@ if (requestForm) {
       contact: formData.get("contact"),
       loginEmail: login.email,
       service,
+      extraServices,
+      serviceNames: getSelectedServiceNames(service, extraServices),
       startDate: formData.get("start_date"),
       duration: formData.get("duration"),
       quantity,
@@ -2252,7 +2388,7 @@ if (requestForm) {
     if (invoiceReviewButton) invoiceReviewButton.hidden = false;
     if (checkoutPreviewForm) checkoutPreviewForm.hidden = true;
     if (checkoutStatus) {
-      checkoutStatus.textContent = "Invoice review is ready. Press Request Checkout to continue to payment preview.";
+      checkoutStatus.textContent = "Invoice review is ready. Press Pay Now to continue to the payment form.";
       checkoutStatus.classList.add("success");
     }
   });
@@ -2267,6 +2403,10 @@ if (invoiceReviewButton) {
     if (invoiceReference) invoiceReference.textContent = reference;
     if (invoiceCustomer) invoiceCustomer.textContent = savedRequest.name || "-";
     if (invoiceContact) invoiceContact.textContent = savedRequest.contact || "-";
+    if (summaryService) summaryService.textContent = (savedRequest.serviceNames && savedRequest.serviceNames.length)
+      ? savedRequest.serviceNames.join(" + ")
+      : invoice.selected.name;
+    if (invoiceDate) invoiceDate.textContent = new Date().toLocaleDateString("en-GB");
     if (invoiceSchedule) invoiceSchedule.textContent = `${savedRequest.startDate || "-"} / ${savedRequest.duration || "-"}`;
     if (invoiceDestination) invoiceDestination.textContent = savedRequest.destination || "-";
 
@@ -2275,7 +2415,10 @@ if (invoiceReviewButton) {
       invoiceReviewPanel.scrollIntoView({ behavior: "smooth", block: "center" });
     }
 
-    const whatsappText = encodeURIComponent(`PTR Connect booking: ${savedRequest.name || "Customer"} - Total ${money.format(invoice.total)}`);
+    const whatsappServices = (savedRequest.serviceNames && savedRequest.serviceNames.length)
+      ? savedRequest.serviceNames.join(" + ")
+      : invoice.selected.name;
+    const whatsappText = encodeURIComponent(`RTP Connect booking: ${savedRequest.name || "Customer"} - Services: ${whatsappServices} - Total ${money.format(invoice.total)}`);
     if (whatsAppNotifyButton) {
       whatsAppNotifyButton.href = `https://wa.me/${adminWhatsAppNumber}?text=${whatsappText}`;
       whatsAppNotifyButton.hidden = false;
@@ -2291,9 +2434,9 @@ if (payNowButton) {
       total: invoice.total,
       service: invoice.selected.name,
       preparedAt: new Date().toISOString(),
-      note: "Card preview opened. Live card entry must use the approved payment provider checkout or secure iframe."
+      note: "Pay Now form opened. Live card entry must use the approved payment provider checkout or secure iframe."
     }));
-    requestStatus.textContent = `Checkout preview opened for ${money.format(invoice.total)}. In live mode, use the approved gateway checkout or secure iframe for Visa / Mastercard authentication.`;
+    requestStatus.textContent = `Pay Now opened for ${money.format(invoice.total)}. In live mode, use the approved gateway checkout or secure iframe for Visa / Mastercard authentication.`;
     requestStatus.classList.add("success");
     if (cardPaymentPanel) {
       cardPaymentPanel.hidden = false;
@@ -2345,10 +2488,10 @@ if (confirmDemoCardButton) {
       cardLast4: last4,
       billingCountry: demoBillingCountry?.value || "",
       confirmedAt: new Date().toISOString(),
-      note: "Preview only. Full card number, expiry, and CVC are not stored."
+      note: "Pay Now preview only. Full card number, expiry, and CVC are not stored."
     }));
 
-    requestStatus.textContent = `Card preview confirmed: ${confirmationReference}. Live approval must be completed by the approved payment provider before receipt and service release.`;
+    requestStatus.textContent = `Pay Now confirmed: ${confirmationReference}. Live approval must be completed by the approved payment provider before receipt and service release.`;
     requestStatus.classList.add("success");
     if (demoCardNumber) demoCardNumber.value = `•••• •••• •••• ${last4}`;
     if (demoCardExpiry) demoCardExpiry.value = "";
@@ -2359,7 +2502,7 @@ if (confirmDemoCardButton) {
 if (checkoutBackButton) {
   checkoutBackButton.addEventListener("click", () => {
     checkoutPreviewForm.hidden = true;
-    checkoutStatus.textContent = "Returned to invoice preview. Press Request Checkout when ready.";
+    checkoutStatus.textContent = "Returned to invoice review. Press Pay Now when ready.";
   });
 }
 
@@ -2378,7 +2521,7 @@ if (checkoutPreviewForm) {
     }));
 
     checkoutPreviewForm.reset();
-    checkoutStatus.textContent = `Gateway handoff prepared: ${confirmationReference}. In live mode, card entry, authentication, authorization, and settlement must be completed by the approved payment provider before receipt and service release.`;
+    checkoutStatus.textContent = `Pay Now handoff prepared: ${confirmationReference}. In live mode, card entry, authentication, authorization, and settlement must be completed by the approved payment provider before receipt and service release.`;
     checkoutStatus.classList.add("success");
   });
 }
@@ -2388,7 +2531,7 @@ if (feedbackForm) {
     event.preventDefault();
     const formData = new FormData(feedbackForm);
     const summary = [
-      "PTR Connect website feedback",
+      "RTP Connect website feedback",
       `Name: ${formData.get("reviewer_name") || "Not provided"}`,
       `Location: ${formData.get("reviewer_location") || "Not provided"}`,
       `Device: ${formData.get("device")}`,
