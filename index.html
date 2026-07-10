@@ -1614,6 +1614,67 @@ input:disabled {
   .service-options {
     grid-template-columns: 1fr;
   }
+
+  .request-section {
+    padding-top: 56px;
+    padding-bottom: 56px;
+  }
+
+  .request-form,
+  .login-panel,
+  .invoice-review-panel,
+  .card-payment-panel {
+    padding: 16px;
+  }
+
+  .invoice-review-panel {
+    gap: 12px;
+  }
+
+  .invoice-review-panel .summary-top,
+  .official-invoice-header,
+  .card-payment-panel .summary-top {
+    grid-template-columns: 1fr;
+    text-align: left;
+  }
+
+  .invoice-meta {
+    text-align: left;
+  }
+
+  .invoice-review-panel dl div {
+    display: grid;
+    gap: 4px;
+    padding: 10px 12px;
+  }
+
+  .invoice-review-panel dd {
+    max-width: none;
+    text-align: left;
+    overflow-wrap: anywhere;
+  }
+
+  .invoice-conditions,
+  .card-demo-warning {
+    font-size: 12px;
+    line-height: 1.45;
+  }
+
+  .card-payment-panel h3 {
+    font-size: 22px;
+  }
+
+  .card-payment-panel .card-brands {
+    justify-content: flex-start;
+  }
+
+  .card-field-row {
+    grid-template-columns: 1fr;
+  }
+
+  .button.full {
+    min-height: 52px;
+  }
 }
 
 </style>
@@ -2020,6 +2081,24 @@ input:disabled {
           <h2>Clear invoice, refund, privacy, and payment terms before checkout.</h2>
           <p>Payment is requested only after service details and invoice review. Customer information is used for booking coordination, invoice records, and legitimate compliance review.</p>
         </div>
+        <div class="safety-grid">
+          <article>
+            <strong>Payment Security</strong>
+            <p>Real card payment must be completed through an approved hosted checkout or secure iframe. RTP Connect does not store full card number, expiry, or CVC.</p>
+          </article>
+          <article>
+            <strong>Refund & Cancellation</strong>
+            <p>Refund eligibility depends on supplier rules, cancellation timing, and the approved invoice terms shown before payment.</p>
+          </article>
+          <article>
+            <strong>Service Delivery</strong>
+            <p>Supplier booking, transport, tour, or business coordination begins only after invoice approval and successful payment confirmation.</p>
+          </article>
+          <article>
+            <strong>Customer Records</strong>
+            <p>Booking request, invoice approval, receipt, and service delivery notes are retained for customer support, dispute review, and compliance checks.</p>
+          </article>
+        </div>
       </section>
 
       <section id="company" class="info-section" aria-label="Company information">
@@ -2052,6 +2131,36 @@ input:disabled {
         </div>
       </section>
 
+      <section id="platform-roadmap" class="info-section" aria-label="Platform development roadmap">
+        <div class="section-copy narrow">
+          <p class="eyebrow">Production Platform Roadmap</p>
+          <h2>Built first as a public request and invoice flow, then prepared for secure backend payment integration.</h2>
+          <p>
+            The current website is the public entry point. The production platform should add customer dashboard,
+            admin dashboard, quotation management, supplier records, payment webhooks, audit logs, and protected
+            backend verification before any live booking is confirmed.
+          </p>
+        </div>
+        <div class="safety-grid">
+          <article>
+            <strong>Customer Area</strong>
+            <p>Requests, quotations, bookings, payments, invoices, receipts, messages, and profile records.</p>
+          </article>
+          <article>
+            <strong>Admin Area</strong>
+            <p>Customer requests, supplier checks, quotations, bookings, payments, refunds, reports, audit log, and settings.</p>
+          </article>
+          <article>
+            <strong>Booking Status</strong>
+            <p>Draft, submitted, under review, quotation sent, awaiting payment, verified, confirmed, in progress, completed, cancelled, or refunded.</p>
+          </article>
+          <article>
+            <strong>Payment Verification</strong>
+            <p>Live payments must be confirmed by bank callback/webhook and backend verification before booking confirmation or service release.</p>
+          </article>
+        </div>
+      </section>
+
       <section id="contact" class="info-section" aria-label="Contact support">
         <div class="section-copy narrow">
           <p class="eyebrow">Contact</p>
@@ -2070,6 +2179,7 @@ input:disabled {
         <nav aria-label="About RTP Connect">
           <h3>About</h3>
           <a href="#company">Company information</a>
+          <a href="#platform-roadmap">Platform roadmap</a>
           <a href="#estimate">What we sell</a>
           <a href="#process">How booking works</a>
           <a href="#request">Confirm to Pay</a>
