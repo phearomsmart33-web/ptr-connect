@@ -3,20 +3,23 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>RTP Connect | Travel, Business & Investment Coordination</title>
+    <title>PTR Connect | Travel, Business & Investment Coordination</title>
     <meta
       name="description"
-      content="RTP Connect provides travel, business, investment, and transportation coordination with itemized invoices and secure hosted checkout readiness."
+      content="PTR Connect provides travel, business, investment, and transportation coordination with itemized invoices and secure hosted checkout readiness."
     />
     <style>
 :root {
   --ink: #111513;
+  --navy: #07184f;
   --paper: #f6f2ea;
   --ivory: #fffaf0;
   --muted: #756f64;
   --gold: #b88a3a;
   --green: #164437;
   --green-2: #246c57;
+  --electric: #0a66ff;
+  --violet: #7b2cff;
   --blue: #0d56a0;
   --booking-blue: #003b95;
   --search-yellow: #febb02;
@@ -51,7 +54,7 @@ a {
 }
 
 .site-header {
-  position: absolute;
+  position: relative;
   z-index: 20;
   top: 0;
   left: 0;
@@ -63,8 +66,8 @@ a {
   max-width: var(--page-width);
   margin: 0 auto;
   padding: 18px clamp(18px, 3vw, 34px);
-  color: var(--ivory);
-  background: transparent;
+  color: var(--navy);
+  background: #fff;
 }
 
 .brand {
@@ -76,14 +79,16 @@ a {
 
 .brand-mark {
   display: grid;
-  width: 44px;
-  height: 44px;
+  width: 54px;
+  height: 42px;
   place-items: center;
-  border: 1px solid rgba(255, 250, 240, 0.45);
-  background: rgba(255, 250, 240, 0.12);
-  color: #f4d68e;
-  font-weight: 800;
+  border: 0;
+  background: linear-gradient(135deg, var(--electric), var(--violet));
+  color: #fff;
+  font-weight: 900;
   letter-spacing: 0;
+  border-radius: 14px 4px 18px 4px;
+  box-shadow: 0 14px 30px rgba(10, 102, 255, 0.2);
 }
 
 .brand strong,
@@ -94,7 +99,7 @@ a {
 
 .brand small {
   margin-top: 4px;
-  color: rgba(255, 250, 240, 0.72);
+  color: #31406e;
   font-size: 12px;
 }
 
@@ -104,41 +109,27 @@ a {
   gap: clamp(12px, 2vw, 28px);
   font-size: 14px;
   font-weight: 700;
-  color: rgba(255, 250, 240, 0.78);
+  color: #07184f;
 }
 
 .nav-links a:hover {
-  color: var(--ivory);
+  color: var(--electric);
 }
 
 .hero {
   position: relative;
-  min-height: 176px;
+  min-height: 0;
   overflow: hidden;
-  color: var(--ivory);
+  color: var(--navy);
   background: #fff;
 }
 
 .hero > img {
-  position: absolute;
-  left: 50%;
-  top: 0;
-  width: min(100%, var(--page-width));
-  transform: translateX(-50%);
-  height: 100%;
-  object-fit: cover;
+  display: none;
 }
 
 .hero-shade {
-  position: absolute;
-  left: 50%;
-  top: 0;
-  width: min(100%, var(--page-width));
-  height: 100%;
-  transform: translateX(-50%);
-  background:
-    linear-gradient(90deg, rgba(17, 21, 19, 0.94) 0%, rgba(17, 21, 19, 0.82) 42%, rgba(17, 21, 19, 0.42) 100%),
-    linear-gradient(0deg, rgba(17, 21, 19, 0.78), rgba(17, 21, 19, 0.16) 52%);
+  display: none;
 }
 
 .hero-content {
@@ -212,14 +203,22 @@ h3 {
 }
 
 .button.primary {
-  background: var(--gold);
-  color: #17120a;
+  background: linear-gradient(135deg, var(--electric), var(--violet));
+  color: #fff;
 }
 
 .button.secondary {
-  border-color: rgba(255, 250, 240, 0.35);
-  background: rgba(255, 250, 240, 0.08);
-  color: var(--ivory);
+  border-color: rgba(10, 102, 255, 0.35);
+  background: #fff;
+  color: var(--navy);
+}
+
+.header-request {
+  min-height: 48px;
+  border-radius: 10px;
+  padding-inline: 24px;
+  box-shadow: 0 14px 32px rgba(123, 44, 255, 0.2);
+  white-space: nowrap;
 }
 
 .request-section .button.secondary,
@@ -256,54 +255,127 @@ h3 {
 }
 
 .booking-dashboard {
-  padding: 0 clamp(18px, 4vw, 42px) 72px;
-  background: #fff;
+  padding: 22px clamp(18px, 4vw, 42px) 72px;
+  background:
+    radial-gradient(circle at 78% 18%, rgba(10, 102, 255, 0.14), transparent 32%),
+    linear-gradient(180deg, #fff 0%, #f8fbff 56%, #fff 100%);
 }
 
 .dashboard-hero {
   max-width: var(--page-width);
-  margin: -28px auto 32px;
-  padding: clamp(26px, 4vw, 42px);
+  margin: 0 auto 22px;
+  padding: clamp(34px, 5vw, 70px) clamp(24px, 5vw, 46px) 26px;
   position: relative;
   z-index: 3;
   border: 0;
-  background: var(--blue);
-  color: #fff;
-  box-shadow: 0 22px 54px rgba(13, 86, 160, 0.2);
+  overflow: hidden;
+  background: transparent;
+  color: var(--navy);
+  box-shadow: none;
+}
+
+.dashboard-hero::before {
+  position: absolute;
+  inset: 4% 0 auto 44%;
+  height: 410px;
+  opacity: 0.62;
+  background-image:
+    radial-gradient(circle, rgba(10, 102, 255, 0.26) 1px, transparent 1.7px);
+  background-size: 12px 12px;
+  mask-image: radial-gradient(ellipse at center, #000 36%, transparent 72%);
+  content: "";
+}
+
+.dashboard-hero::after {
+  position: absolute;
+  right: clamp(18px, 7vw, 90px);
+  top: 74px;
+  color: transparent;
+  background: linear-gradient(135deg, var(--electric), var(--violet));
+  -webkit-background-clip: text;
+  background-clip: text;
+  content: "PTR";
+  font-size: clamp(118px, 18vw, 250px);
+  font-weight: 1000;
+  line-height: 0.8;
+  letter-spacing: 0;
+  opacity: 0.9;
+  filter: drop-shadow(0 20px 36px rgba(10, 102, 255, 0.16));
+  pointer-events: none;
 }
 
 .dashboard-hero .eyebrow {
-  color: #ffd15c;
+  color: var(--electric);
+  font-size: 15px;
+  letter-spacing: 0.18em;
 }
 
 .dashboard-hero h2 {
-  max-width: 820px;
-  margin-bottom: 10px;
-  color: #fff;
+  position: relative;
+  z-index: 2;
+  max-width: 520px;
+  margin-bottom: 16px;
+  color: var(--navy);
+  font-size: clamp(50px, 7vw, 76px);
+  line-height: 0.98;
+}
+
+.dashboard-hero h2 em {
+  display: block;
+  color: transparent;
+  background: linear-gradient(135deg, var(--electric), var(--violet));
+  -webkit-background-clip: text;
+  background-clip: text;
+  font-style: normal;
 }
 
 .dashboard-hero p {
-  color: rgba(255, 255, 255, 0.86);
+  position: relative;
+  z-index: 2;
+  max-width: 520px;
+  color: #253766;
+  font-size: 19px;
+  line-height: 1.65;
+}
+
+.dashboard-hero .hero-actions {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  margin-top: 26px;
+}
+
+.dashboard-hero .hero-actions .button {
+  min-width: 160px;
+  border-radius: 10px;
 }
 
 .booking-search {
+  position: relative;
+  z-index: 4;
   display: grid;
   grid-template-columns: 1.3fr 0.88fr 0.88fr 0.95fr auto;
-  gap: 4px;
-  margin-top: 28px;
-  padding: 4px;
-  background: var(--search-yellow);
-  border-radius: 4px;
-  box-shadow: 0 10px 24px rgba(17, 21, 19, 0.16);
+  gap: 0;
+  margin-top: 42px;
+  padding: 12px;
+  border: 1px solid rgba(10, 102, 255, 0.08);
+  background: rgba(255, 255, 255, 0.92);
+  border-radius: 16px;
+  box-shadow: 0 22px 70px rgba(7, 24, 79, 0.13);
 }
 
 .booking-search label {
-  gap: 6px;
+  gap: 8px;
   min-width: 0;
-  padding: 10px 12px;
+  padding: 12px 24px;
+  border-right: 1px solid rgba(7, 24, 79, 0.12);
   background: #fff;
-  color: var(--ink);
-  font-size: 12px;
+  color: #334674;
+  font-size: 14px;
+}
+
+.booking-search label:last-of-type {
+  border-right: 0;
 }
 
 .booking-search input {
@@ -314,9 +386,99 @@ h3 {
 }
 
 .booking-search .button {
-  min-height: 72px;
-  background: #006ce4;
+  min-height: 64px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--electric), var(--violet));
   color: #fff;
+  box-shadow: 0 16px 34px rgba(123, 44, 255, 0.22);
+}
+
+.home-service-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+  max-width: var(--page-width);
+  margin: 0 auto 28px;
+}
+
+.home-service-card {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 18px;
+  min-height: 176px;
+  align-items: start;
+  padding: 28px 24px;
+  border: 1px solid rgba(10, 102, 255, 0.08);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 20px 60px rgba(7, 24, 79, 0.08);
+}
+
+.home-service-card .service-icon,
+.trust-strip .service-icon {
+  display: grid;
+  width: 58px;
+  height: 58px;
+  place-items: center;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(10, 102, 255, 0.12), rgba(123, 44, 255, 0.12));
+  color: var(--electric);
+  font-size: 26px;
+  font-weight: 900;
+}
+
+.home-service-card h3 {
+  margin-bottom: 14px;
+  color: var(--navy);
+}
+
+.home-service-card p {
+  margin: 0;
+  color: #344775;
+  line-height: 1.55;
+}
+
+.home-service-card a {
+  align-self: end;
+  color: var(--electric);
+  font-weight: 900;
+}
+
+.trust-strip {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1px;
+  max-width: var(--page-width);
+  margin: 0 auto 28px;
+  overflow: hidden;
+  border-radius: 14px;
+  background: rgba(10, 102, 255, 0.18);
+  box-shadow: 0 18px 50px rgba(7, 24, 79, 0.08);
+}
+
+.trust-strip article {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 16px;
+  align-items: center;
+  min-height: 96px;
+  padding: 22px 28px;
+  background: #eef5ff;
+}
+
+.trust-strip strong,
+.trust-strip span {
+  display: block;
+}
+
+.trust-strip strong {
+  color: var(--navy);
+}
+
+.trust-strip span {
+  margin-top: 4px;
+  color: #344775;
+  line-height: 1.35;
 }
 
 .dashboard-block {
@@ -664,10 +826,21 @@ h3 {
   content: "";
 }
 
-.process-section,
+.process-section {
+  background: #fff;
+  color: var(--ink);
+}
+
 .calculator-section {
-  background: #10251f;
-  color: var(--ivory);
+  background: #fff;
+  color: var(--ink);
+  padding-top: 26px;
+}
+
+.process-section .section-heading.narrow,
+.calculator-section .section-heading.narrow {
+  max-width: var(--page-width);
+  text-align: left;
 }
 
 .flow {
@@ -676,24 +849,25 @@ h3 {
   gap: 1px;
   max-width: var(--page-width);
   margin: 0 auto;
-  background: rgba(255, 250, 240, 0.2);
+  border: 1px solid var(--line);
+  background: var(--line);
 }
 
 .flow article {
-  min-height: 248px;
-  padding: 24px;
-  background: #10251f;
+  min-height: 190px;
+  padding: 22px;
+  background: #fffaf0;
 }
 
 .flow span {
   display: block;
-  margin-bottom: 40px;
+  margin-bottom: 24px;
   color: var(--gold);
   font-weight: 900;
 }
 
 .flow p {
-  color: rgba(255, 250, 240, 0.72);
+  color: var(--muted);
   line-height: 1.65;
 }
 
@@ -1203,8 +1377,8 @@ h3 {
   max-width: 980px;
   margin: 0 auto;
   padding: 26px;
-  border: 1px solid rgba(255, 250, 240, 0.18);
-  background: rgba(255, 250, 240, 0.08);
+  border: 1px solid var(--line);
+  background: #fffaf0;
 }
 
 label {
@@ -1235,7 +1409,7 @@ input:disabled {
 
 .calculator-section select,
 .calculator-section input {
-  border-color: rgba(255, 250, 240, 0.25);
+  border-color: var(--line);
 }
 
 .estimate-result {
@@ -1529,10 +1703,12 @@ input:disabled {
   }
 
   .service-grid.four,
+  .home-service-grid,
+  .trust-strip,
   .company-grid,
   .review-grid,
   .proof-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .booking-search,
@@ -1540,6 +1716,14 @@ input:disabled {
   .stay-row,
   .activity-row {
     grid-template-columns: 1fr;
+  }
+
+  .dashboard-hero::after {
+    opacity: 0.2;
+  }
+
+  .header-request {
+    display: none;
   }
 
   .booking-search .button {
@@ -1565,7 +1749,7 @@ input:disabled {
 
 @media (max-width: 720px) {
   .site-header {
-    position: absolute;
+    position: relative;
     align-items: flex-start;
   }
 
@@ -1574,7 +1758,7 @@ input:disabled {
   }
 
   .hero {
-    min-height: 248px;
+    min-height: 0;
   }
 
   .hero-content {
@@ -1604,14 +1788,14 @@ input:disabled {
   .dashboard-hero {
     width: 100%;
     overflow: hidden;
-    margin-top: -26px;
+    margin-top: 0;
     padding: 24px;
   }
 
   .dashboard-hero h2 {
     max-width: 320px;
-    font-size: 26px;
-    line-height: 1.08;
+    font-size: 44px;
+    line-height: 0.98;
   }
 
   .dashboard-hero p {
@@ -1631,6 +1815,19 @@ input:disabled {
   .booking-search {
     width: 100%;
     max-width: calc(100vw - 48px);
+  }
+
+  .home-service-grid,
+  .trust-strip {
+    grid-template-columns: 1fr;
+  }
+
+  .home-service-card {
+    grid-template-columns: auto 1fr;
+  }
+
+  .home-service-card a {
+    grid-column: 2;
   }
 
   .trust-band {
@@ -1761,20 +1958,24 @@ input:disabled {
   </head>
   <body>
     <header class="site-header" aria-label="Main navigation">
-      <a class="brand" href="#top" aria-label="RTP Connect home">
-        <span class="brand-mark">RTP</span>
+      <a class="brand" href="#top" aria-label="PTR Connect home">
+        <span class="brand-mark">PTR</span>
         <span>
-          <strong>RTP Connect</strong>
-          <small>Travel | Business | Investment</small>
+          <strong>PTR Connect</strong>
+          <small>ptrconnect.online</small>
         </span>
       </a>
       <nav class="nav-links" aria-label="Primary">
+        <a href="#top">Home</a>
+        <a href="#services">Services</a>
+        <a href="#destinations">Destinations</a>
+        <a href="#request">Business</a>
+        <a href="#company">Company</a>
+        <a href="#contact">Contact</a>
         <a href="#estimate">Fees</a>
         <a href="#process">Process</a>
-        <a href="#compliance">AML/KYC</a>
-        <a href="#request">Request</a>
-        <a href="#request">Feedback</a>
       </nav>
+      <a class="button primary header-request" href="#request">Submit Request</a>
     </header>
 
     <main id="top">
@@ -1783,7 +1984,7 @@ input:disabled {
         <div class="hero-shade"></div>
         <div class="hero-content">
           <p class="eyebrow">Connecting Global Opportunities</p>
-          <h1>RTP Connect coordination desk.</h1>
+          <h1>PTR Connect coordination desk.</h1>
           <p class="hero-copy">
             Travel, business, investment, and transport support with itemized invoices and secure
             payment flow before service starts.
@@ -1797,9 +1998,13 @@ input:disabled {
 
       <section class="booking-dashboard" aria-label="Booking dashboard">
         <div class="dashboard-hero">
-          <p class="eyebrow">RTP Connect Desk</p>
-          <h2>Find and arrange your next Cambodia stay, tour, transport, or business service.</h2>
-          <p>Search the request details first. We confirm supplier availability before payment.</p>
+          <p class="eyebrow">Your Trusted Gateway</p>
+          <h2>Travel. Business. <em>Investment.</em></h2>
+          <p>PTR Connect is your all-in-one platform for seamless travel, business services, investment support, and verified coordination worldwide.</p>
+          <div class="hero-actions">
+            <a class="button primary" href="#services">Explore Services</a>
+            <a class="button secondary" href="#process">How It Works</a>
+          </div>
           <form class="booking-search" action="#request">
             <label>
               Destination or service
@@ -1821,7 +2026,61 @@ input:disabled {
           </form>
         </div>
 
-        <div class="dashboard-block">
+        <section class="home-service-grid" id="services" aria-label="PTR Connect service categories">
+          <article class="home-service-card">
+            <span class="service-icon">T</span>
+            <div>
+              <h3>Travel Services</h3>
+              <p>Hotels, tours, airport transfer, private transport, and trip coordination.</p>
+            </div>
+            <a href="#request">Learn More</a>
+          </article>
+          <article class="home-service-card">
+            <span class="service-icon">B</span>
+            <div>
+              <h3>Business Services</h3>
+              <p>Company setup, consulting, local legal coordination, and case support.</p>
+            </div>
+            <a href="#request">Learn More</a>
+          </article>
+          <article class="home-service-card">
+            <span class="service-icon">I</span>
+            <div>
+              <h3>Investment</h3>
+              <p>Global investment opportunities with trusted local and overseas partners.</p>
+            </div>
+            <a href="#request">Learn More</a>
+          </article>
+          <article class="home-service-card">
+            <span class="service-icon">24</span>
+            <div>
+              <h3>Customer Support</h3>
+              <p>Booking review, invoice assistance, supplier coordination, and updates.</p>
+            </div>
+            <a href="#contact">Contact Us</a>
+          </article>
+        </section>
+
+        <section class="trust-strip" aria-label="Customer trust summary">
+          <article>
+            <span class="service-icon">S</span>
+            <div><strong>Secure & Reliable</strong><span>Customer data and payment steps are protected.</span></div>
+          </article>
+          <article>
+            <span class="service-icon">P</span>
+            <div><strong>Transparent Pricing</strong><span>Itemized invoices show supplier cost and service fee.</span></div>
+          </article>
+          <article>
+            <span class="service-icon">V</span>
+            <div><strong>Verified Suppliers</strong><span>We coordinate with reviewed hotels and local partners.</span></div>
+          </article>
+          <article>
+            <span class="service-icon">✓</span>
+            <div><strong>Secure Payments</strong><span>Pay only after invoice review and supplier confirmation.</span></div>
+          </article>
+        </section>
+
+        <div class="dashboard-block" id="destinations">
           <div class="dashboard-title">
             <h3>Popular Cambodia Areas</h3>
             <a href="#request">Request another area</a>
@@ -2081,7 +2340,7 @@ input:disabled {
             </div>
             <div class="official-invoice-header">
               <div>
-                <strong>RTP Connect Service Invoice</strong>
+                <strong>PTR Connect Service Invoice</strong>
                 <span>Issued for customer review after booking details are recorded.</span>
                 <small>Legal operator support: PRATHNA KASEKOR KHMER IMPORT EXPORT CO., LTD.</small>
               </div>
@@ -2164,7 +2423,7 @@ input:disabled {
               <p>Payment is requested only after service details, supplier review, and invoice approval.</p>
             </div>
             <div class="review-points">
-              <article><strong>Payment Security</strong><p>Real card payment uses approved hosted checkout or secure iframe. RTP Connect does not store full card number, expiry, or CVC.</p></article>
+              <article><strong>Payment Security</strong><p>Real card payment uses approved hosted checkout or secure iframe. PTR Connect does not store full card number, expiry, or CVC.</p></article>
               <article><strong>Refund & Cancellation</strong><p>Refund eligibility depends on supplier rules, cancellation timing, and approved invoice terms.</p></article>
               <article><strong>Service Delivery</strong><p>Booking, transport, tour, or business coordination begins after invoice approval and successful payment confirmation.</p></article>
               <article><strong>Customer Records</strong><p>Request, invoice, receipt, and delivery notes are retained for support, dispute review, and compliance checks.</p></article>
@@ -2175,7 +2434,7 @@ input:disabled {
             <div>
               <p class="eyebrow">Company Information</p>
               <h2>Registered company support.</h2>
-              <p>RTP Connect is operated for travel, transport, business coordination, and invoice-based service payment handling.</p>
+              <p>PTR Connect is operated for travel, transport, business coordination, and invoice-based service payment handling.</p>
             </div>
             <div class="review-points">
               <article><strong>Registered Company</strong><p>PRATHNA KASEKOR KHMER IMPORT EXPORT CO., LTD.</p></article>
@@ -2204,7 +2463,7 @@ input:disabled {
       <section id="contact" class="info-section" aria-label="Contact support">
         <div class="section-copy narrow">
           <p class="eyebrow">Contact</p>
-          <h2>RTP Connect support is available for booking and invoice review.</h2>
+          <h2>PTR Connect support is available for booking and invoice review.</h2>
           <p>For customer support, use the booking request form and WhatsApp notification flow after invoice review.</p>
         </div>
       </section>
@@ -2212,11 +2471,11 @@ input:disabled {
 
     <footer class="site-footer">
       <div class="footer-brand">
-        <strong>RTP Connect</strong>
+        <strong>PTR Connect</strong>
         <span>Travel | Business | Investment. Operated with registered company support, itemized invoices, secure checkout readiness, and AML/KYC procedures.</span>
       </div>
       <div class="footer-columns">
-        <nav aria-label="About RTP Connect">
+        <nav aria-label="About PTR Connect">
           <h3>About</h3>
           <a href="#company">Company information</a>
           <a href="#platform-roadmap">Platform roadmap</a>
@@ -2473,7 +2732,7 @@ document.querySelectorAll(".activity-tabs button").forEach((button) => {
 if (hostedCheckoutButton) {
   hostedCheckoutButton.addEventListener("click", () => {
     const invoice = getCurrentInvoice();
-    const demoReference = `RTP-${Date.now().toString().slice(-6)}`;
+    const demoReference = `PTR-${Date.now().toString().slice(-6)}`;
     const checkoutPayload = {
       reference: demoReference,
       service: invoice.selected.name,
@@ -2568,7 +2827,7 @@ if (invoiceReviewButton) {
     const whatsappServices = (savedRequest.serviceNames && savedRequest.serviceNames.length)
       ? savedRequest.serviceNames.join(" + ")
       : invoice.selected.name;
-    const whatsappText = encodeURIComponent(`RTP Connect booking: ${savedRequest.name || "Customer"} - Services: ${whatsappServices} - Total ${money.format(invoice.total)}`);
+    const whatsappText = encodeURIComponent(`PTR Connect booking: ${savedRequest.name || "Customer"} - Services: ${whatsappServices} - Total ${money.format(invoice.total)}`);
     if (whatsAppNotifyButton) {
       whatsAppNotifyButton.href = `https://wa.me/${adminWhatsAppNumber}?text=${whatsappText}`;
       whatsAppNotifyButton.hidden = false;
@@ -2681,7 +2940,7 @@ if (feedbackForm) {
     event.preventDefault();
     const formData = new FormData(feedbackForm);
     const summary = [
-      "RTP Connect website feedback",
+      "PTR Connect website feedback",
       `Name: ${formData.get("reviewer_name") || "Not provided"}`,
       `Location: ${formData.get("reviewer_location") || "Not provided"}`,
       `Device: ${formData.get("device")}`,
