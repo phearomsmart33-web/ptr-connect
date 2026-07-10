@@ -907,6 +907,81 @@ h3 {
   text-align: center;
 }
 
+.card-payment-panel {
+  display: grid;
+  gap: 14px;
+  margin-top: 16px;
+  padding: 20px;
+  border: 1px solid rgba(17, 21, 19, 0.16);
+  background: #fff;
+}
+
+.card-payment-panel[hidden] {
+  display: none;
+}
+
+.card-payment-panel h3 {
+  margin: 0;
+  font-size: 20px;
+}
+
+.card-payment-panel .card-brands {
+  display: flex;
+  gap: 6px;
+  justify-content: flex-end;
+}
+
+.brand-pill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 4px 7px;
+  border-radius: 4px;
+  background: #0b57d0;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0;
+}
+
+.brand-pill.mastercard {
+  background: #111513;
+}
+
+.card-payment-panel label {
+  display: grid;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.card-payment-panel input,
+.card-payment-panel select {
+  min-height: 48px;
+  width: 100%;
+  border: 1px solid rgba(17, 21, 19, 0.18);
+  background: #fff;
+  padding: 12px 14px;
+  color: var(--ink);
+  font: inherit;
+}
+
+.card-field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.card-demo-warning {
+  margin: 0;
+  padding: 12px;
+  border: 1px solid rgba(184, 138, 58, 0.32);
+  background: rgba(184, 138, 58, 0.1);
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
 .safety-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -1797,6 +1872,45 @@ input:disabled {
             </div>
             <a class="button secondary full" id="whatsAppNotifyButton" href="#" target="_blank" rel="noopener" hidden>Notify Admin via WhatsApp</a>
             <button class="button primary full" id="payNowButton" type="button" hidden>Checkout / Pay Now</button>
+            <div class="card-payment-panel" id="cardPaymentPanel" aria-label="Card payment preview" hidden>
+              <div class="summary-top">
+                <h3>Debit or credit card</h3>
+                <div class="card-brands" aria-label="Accepted card brands">
+                  <span class="brand-pill">VISA</span>
+                  <span class="brand-pill mastercard">Mastercard</span>
+                </div>
+              </div>
+              <label>
+                Cardholder name
+                <input type="text" id="demoCardName" placeholder="Full name on card" autocomplete="cc-name" />
+              </label>
+              <label>
+                Card number
+                <input type="text" id="demoCardNumber" inputmode="numeric" maxlength="19" placeholder="1234 1234 1234 1234" autocomplete="cc-number" />
+              </label>
+              <div class="card-field-row">
+                <label>
+                  MM / YY
+                  <input type="text" id="demoCardExpiry" inputmode="numeric" maxlength="5" placeholder="MM/YY" autocomplete="cc-exp" />
+                </label>
+                <label>
+                  CVC
+                  <input type="text" id="demoCardCvc" inputmode="numeric" maxlength="4" placeholder="CVC" autocomplete="cc-csc" />
+                </label>
+              </div>
+              <label>
+                Billing country
+                <select id="demoBillingCountry">
+                  <option>Cambodia</option>
+                  <option>United States</option>
+                  <option>Singapore</option>
+                  <option>Thailand</option>
+                  <option>Other</option>
+                </select>
+              </label>
+              <p class="card-demo-warning">Demo preview only. In live operation, card data must be entered on the approved payment provider page or secure iframe, with 3DS authentication enabled where required.</p>
+              <button class="button primary full" id="confirmDemoCardButton" type="button">Confirm Card Preview</button>
+            </div>
           </article>
           <p class="form-note">
             No payment is collected from this form. Payment is requested only after invoice approval;
@@ -1880,6 +1994,13 @@ const invoiceSchedule = document.querySelector("#invoiceSchedule");
 const invoiceDestination = document.querySelector("#invoiceDestination");
 const whatsAppNotifyButton = document.querySelector("#whatsAppNotifyButton");
 const payNowButton = document.querySelector("#payNowButton");
+const cardPaymentPanel = document.querySelector("#cardPaymentPanel");
+const demoCardName = document.querySelector("#demoCardName");
+const demoCardNumber = document.querySelector("#demoCardNumber");
+const demoCardExpiry = document.querySelector("#demoCardExpiry");
+const demoCardCvc = document.querySelector("#demoCardCvc");
+const demoBillingCountry = document.querySelector("#demoBillingCountry");
+const confirmDemoCardButton = document.querySelector("#confirmDemoCardButton");
 const feedbackForm = document.querySelector(".feedback-form");
 const feedbackStatus = document.querySelector("#feedbackStatus");
 const adminWhatsAppNumber = "85586301033";
@@ -2170,10 +2291,68 @@ if (payNowButton) {
       total: invoice.total,
       service: invoice.selected.name,
       preparedAt: new Date().toISOString(),
-      note: "Replace this placeholder with the approved payment gateway checkout URL."
+      note: "Card preview opened. Live card entry must use the approved payment provider checkout or secure iframe."
     }));
-    requestStatus.textContent = `Pay Now handoff prepared for ${money.format(invoice.total)}. Replace placeholder with the live approved payment gateway URL after merchant approval.`;
+    requestStatus.textContent = `Checkout preview opened for ${money.format(invoice.total)}. In live mode, use the approved gateway checkout or secure iframe for Visa / Mastercard authentication.`;
     requestStatus.classList.add("success");
+    if (cardPaymentPanel) {
+      cardPaymentPanel.hidden = false;
+      cardPaymentPanel.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  });
+}
+
+function formatCardNumber(value) {
+  return value.replace(/\D/g, "").slice(0, 16).replace(/(.{4})/g, "$1 ").trim();
+}
+
+function formatExpiry(value) {
+  const digits = value.replace(/\D/g, "").slice(0, 4);
+  if (digits.length <= 2) return digits;
+  return `${digits.slice(0, 2)}/${digits.slice(2)}`;
+}
+
+if (demoCardNumber) {
+  demoCardNumber.addEventListener("input", () => {
+    demoCardNumber.value = formatCardNumber(demoCardNumber.value);
+  });
+}
+
+if (demoCardExpiry) {
+  demoCardExpiry.addEventListener("input", () => {
+    demoCardExpiry.value = formatExpiry(demoCardExpiry.value);
+  });
+}
+
+if (demoCardCvc) {
+  demoCardCvc.addEventListener("input", () => {
+    demoCardCvc.value = demoCardCvc.value.replace(/\D/g, "").slice(0, 4);
+  });
+}
+
+if (confirmDemoCardButton) {
+  confirmDemoCardButton.addEventListener("click", () => {
+    const invoice = getCurrentInvoice();
+    const cardDigits = (demoCardNumber?.value || "").replace(/\D/g, "");
+    const last4 = cardDigits.slice(-4) || "0000";
+    const confirmationReference = `CARD-${Date.now().toString().slice(-6)}`;
+
+    localStorage.setItem("latestCardPreviewConfirmation", JSON.stringify({
+      reference: confirmationReference,
+      service: invoice.selected.name,
+      total: invoice.total,
+      cardholder: demoCardName?.value || "",
+      cardLast4: last4,
+      billingCountry: demoBillingCountry?.value || "",
+      confirmedAt: new Date().toISOString(),
+      note: "Preview only. Full card number, expiry, and CVC are not stored."
+    }));
+
+    requestStatus.textContent = `Card preview confirmed: ${confirmationReference}. Live approval must be completed by the approved payment provider before receipt and service release.`;
+    requestStatus.classList.add("success");
+    if (demoCardNumber) demoCardNumber.value = `•••• •••• •••• ${last4}`;
+    if (demoCardExpiry) demoCardExpiry.value = "";
+    if (demoCardCvc) demoCardCvc.value = "";
   });
 }
 
