@@ -2736,6 +2736,231 @@ input:disabled {
   }
 }
 
+/* Final clean header and hero polish */
+.site-header {
+  min-height: 76px;
+  align-items: center;
+  gap: 22px;
+  padding-top: 12px;
+  padding-bottom: 12px;
+}
+
+.brand {
+  min-width: 250px;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand-mark {
+  width: 66px;
+  height: 38px;
+  border: 0;
+  color: transparent;
+  background: transparent;
+  overflow: visible;
+}
+
+.brand-mark::before {
+  font-size: 42px;
+  background: linear-gradient(135deg, #087cff 8%, #8a2cff 86%);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+.brand strong {
+  font-size: 19px;
+  line-height: 1;
+  letter-spacing: 0.035em;
+  white-space: nowrap;
+}
+
+.brand small {
+  margin-top: 5px;
+  font-size: 9px;
+  letter-spacing: 0.19em;
+  white-space: nowrap;
+}
+
+.nav-links {
+  flex: 1;
+  justify-content: center;
+  gap: clamp(13px, 1.35vw, 22px);
+  min-width: 0;
+  font-size: 12px;
+  line-height: 1;
+}
+
+.nav-links a {
+  white-space: nowrap;
+}
+
+.header-actions {
+  gap: 18px;
+}
+
+.language-select {
+  font-size: 12px;
+}
+
+.header-request {
+  min-width: 142px;
+  min-height: 46px;
+  padding-inline: 18px;
+  font-size: 13px;
+  box-shadow: 0 14px 28px rgba(123, 44, 255, 0.18);
+}
+
+.header-request::before {
+  display: inline-block;
+  margin-right: 6px;
+}
+
+.dashboard-hero {
+  min-height: 520px;
+  padding-top: 42px;
+}
+
+.dashboard-hero .eyebrow {
+  font-size: 14px;
+  letter-spacing: 0.24em;
+}
+
+.dashboard-hero h2 {
+  max-width: 470px;
+  font-size: clamp(48px, 5.45vw, 70px);
+  line-height: 0.98;
+  letter-spacing: 0;
+}
+
+.dashboard-hero p {
+  max-width: 465px;
+  margin-top: 20px;
+  color: #172a63;
+  font-size: 17px;
+  line-height: 1.58;
+}
+
+.hero-wordmark {
+  top: 105px;
+  right: clamp(38px, 9vw, 120px);
+}
+
+.hero-wordmark strong {
+  font-size: clamp(126px, 15vw, 210px);
+}
+
+.hero-wordmark span {
+  margin-top: 10px;
+  font-size: clamp(30px, 3.55vw, 50px);
+}
+
+@media (max-width: 1100px) {
+  .site-header {
+    grid-template-columns: 1fr auto;
+  }
+
+  .brand {
+    min-width: 0;
+  }
+
+  .nav-links {
+    order: 3;
+    grid-column: 1 / -1;
+    justify-content: flex-start;
+    overflow-x: auto;
+    padding-bottom: 6px;
+  }
+}
+
+@media (max-width: 760px) {
+  .site-header {
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+
+  .brand strong {
+    font-size: 16px;
+  }
+
+  .brand small {
+    font-size: 8px;
+  }
+
+  .header-request {
+    min-width: 118px;
+    min-height: 42px;
+    padding-inline: 12px;
+    font-size: 12px;
+  }
+
+  .dashboard-hero h2 {
+    font-size: clamp(42px, 13vw, 58px);
+  }
+}
+
+.site-header .brand .brand-mark {
+  width: 74px;
+  min-width: 74px;
+  overflow: visible;
+}
+
+.site-header .brand .brand-mark::before {
+  font-size: 42px;
+}
+
+.print-invoice-preview {
+  display: grid;
+  gap: 14px;
+  position: fixed;
+  inset: 18px;
+  z-index: 80;
+  overflow: auto;
+  margin-top: 0;
+  padding: 18px;
+  border: 1px solid rgba(10, 102, 255, 0.18);
+  border-radius: 18px;
+  background: rgba(248, 251, 255, 0.98);
+  box-shadow: 0 30px 90px rgba(7, 24, 79, 0.24);
+}
+
+.print-invoice-preview[hidden] {
+  display: none;
+}
+
+.print-invoice-preview .summary-top {
+  align-items: center;
+  max-width: 980px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 12px 14px;
+  border: 1px solid rgba(10, 102, 255, 0.14);
+  border-radius: 12px;
+  background: #fff;
+}
+
+.print-invoice-preview .summary-top span {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.print-invoice-preview .summary-top .button {
+  width: auto;
+  min-height: 42px;
+  padding-inline: 18px;
+}
+
+.print-invoice-preview iframe {
+  width: 100%;
+  max-width: 980px;
+  min-height: 760px;
+  margin: 0 auto;
+  border: 1px solid rgba(7, 24, 79, 0.14);
+  border-radius: 10px;
+  background: #fff;
+}
+
 </style>
   </head>
   <body>
@@ -3155,7 +3380,9 @@ input:disabled {
               <p>Payment is requested only after invoice review. Supplier booking or service work proceeds after payment approval. Live card details must be entered only on the approved payment gateway.</p>
             </div>
             <a class="button secondary full" id="whatsAppNotifyButton" href="#" target="_blank" rel="noopener" hidden>Notify Admin via WhatsApp</a>
+            <button class="button secondary full" id="pdfInvoiceButton" type="button" hidden>View / Download PDF Invoice</button>
             <button class="button primary full" id="payNowButton" type="button" hidden>Pay Now</button>
+            <div class="print-invoice-preview" id="printInvoicePreview" hidden></div>
             <div class="card-payment-panel" id="cardPaymentPanel" aria-label="Pay Now card payment form" hidden>
               <div class="summary-top">
                 <h3>Pay Now</h3>
@@ -3201,59 +3428,6 @@ input:disabled {
             supplier booking or service work proceeds after Visa or Mastercard payment is approved.
           </p>
         </form>
-      </section>
-      <section id="policy-summary" class="info-section compact-review-section" aria-label="Policy summary">
-        <div class="review-stack">
-          <div class="review-panel">
-            <div>
-              <p class="eyebrow">Policy Summary</p>
-              <h2>Clear terms before Pay Now.</h2>
-              <p>Payment is requested only after service details, supplier review, and invoice approval.</p>
-            </div>
-            <div class="review-points">
-              <article><strong>Payment Security</strong><p>Real card payment uses approved hosted checkout or secure iframe. PTR Connect does not store full card number, expiry, or CVC.</p></article>
-              <article><strong>Refund & Cancellation</strong><p>Refund eligibility depends on supplier rules, cancellation timing, and approved invoice terms.</p></article>
-              <article><strong>Service Delivery</strong><p>Booking, transport, tour, or business coordination begins after invoice approval and successful payment confirmation.</p></article>
-              <article><strong>Customer Records</strong><p>Request, invoice, receipt, and delivery notes are retained for support, dispute review, and compliance checks.</p></article>
-            </div>
-          </div>
-
-          <div id="company" class="review-panel" aria-label="Company information">
-            <div>
-              <p class="eyebrow">Company Information</p>
-              <h2>Registered company support.</h2>
-              <p>PTR Connect is operated for travel, transport, business coordination, and invoice-based service payment handling.</p>
-            </div>
-            <div class="review-points">
-              <article><strong>Registered Company</strong><p>PRATHNA KASEKOR KHMER IMPORT EXPORT CO., LTD.</p></article>
-              <article><strong>Legal Form</strong><p>Private Limited Company, incorporated in Cambodia on 19 May 2025.</p></article>
-              <article><strong>Registered Activity</strong><p>Main business activity recorded as Travel Agency for tax registration review.</p></article>
-              <article><strong>Tax Registration</strong><p>Registered with the General Department of Taxation from 20 May 2025. Certificates are available for processor review.</p></article>
-            </div>
-          </div>
-
-          <div id="platform-roadmap" class="review-panel" aria-label="Platform development roadmap">
-            <div>
-              <p class="eyebrow">Platform Roadmap</p>
-              <h2>Simple now, secure backend next.</h2>
-              <p>The current site is the public request and invoice entry point. Live payment release requires backend verification.</p>
-            </div>
-            <div class="review-points">
-              <article><strong>Customer Area</strong><p>Requests, quotations, bookings, payments, invoices, receipts, messages, and profile records.</p></article>
-              <article><strong>Admin Area</strong><p>Supplier checks, quotations, bookings, payments, refunds, reports, audit log, and settings.</p></article>
-              <article><strong>Booking Status</strong><p>Draft, submitted, under review, awaiting payment, verified, confirmed, in progress, completed, cancelled, or refunded.</p></article>
-              <article><strong>Payment Verification</strong><p>Live payments must be confirmed by bank callback/webhook and backend verification before booking release.</p></article>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section id="contact" class="info-section contact-section" aria-label="Contact support">
-        <div class="section-copy narrow">
-          <p class="eyebrow">Contact</p>
-          <h2>PTR Connect support is available for booking and invoice review.</h2>
-          <p>For customer support, use the booking request form and WhatsApp notification flow after invoice review.</p>
-        </div>
       </section>
     </main>
 
@@ -3317,7 +3491,7 @@ input:disabled {
           <h3>Contact Us</h3>
           <p><strong>Email:</strong> info@ptrconnect.online</p>
           <p><strong>Phone / WhatsApp:</strong> +855 86 301 033</p>
-          <p><strong>Address:</strong> Phnom Penh, Cambodia</p>
+          <p><strong>Address:</strong> Poipet, Banteay Meanchey, Cambodia</p>
           <p><strong>Working Hours:</strong><br />Mon - Fri: 8:30 AM - 5:30 PM<br />(Saturday: by appointment)</p>
         </div>
         <div class="footer-company" aria-label="Registered company support">
@@ -3365,7 +3539,9 @@ const invoiceDate = document.querySelector("#invoiceDate");
 const invoiceSchedule = document.querySelector("#invoiceSchedule");
 const invoiceDestination = document.querySelector("#invoiceDestination");
 const whatsAppNotifyButton = document.querySelector("#whatsAppNotifyButton");
+const pdfInvoiceButton = document.querySelector("#pdfInvoiceButton");
 const payNowButton = document.querySelector("#payNowButton");
+const printInvoicePreview = document.querySelector("#printInvoicePreview");
 const cardPaymentPanel = document.querySelector("#cardPaymentPanel");
 const demoCardName = document.querySelector("#demoCardName");
 const demoCardNumber = document.querySelector("#demoCardNumber");
@@ -3376,6 +3552,18 @@ const confirmDemoCardButton = document.querySelector("#confirmDemoCardButton");
 const feedbackForm = document.querySelector(".feedback-form");
 const feedbackStatus = document.querySelector("#feedbackStatus");
 const adminWhatsAppNumber = "85586301033";
+const registeredCompany = {
+  name: "PRATHNA KASEKOR KHMER IMPORT EXPORT CO., LTD.",
+  brand: "PTR Connect",
+  taxId: "B101-902502433",
+  taxBranch: "Banteay Meanchey Tax Branch",
+  registeredDate: "20 May 2025",
+  address: "Poipet, Banteay Meanchey, Cambodia",
+  addressKhmer: "ក្រុងប៉ោយប៉ែត ខេត្តបន្ទាយមានជ័យ",
+  phone: "+855 86 301 033",
+  email: "info@ptrconnect.online",
+  website: "www.ptrconnect.online"
+};
 
 const services = {
   hotel: {
@@ -3463,6 +3651,260 @@ function getSelectedServiceNames(primaryService, extraServices = []) {
   const unique = [primaryService, ...extraServices].filter(Boolean).filter((value, index, list) => list.indexOf(value) === index);
   return unique.map((value) => services[value]?.name).filter(Boolean);
 }
+
+function escapeHtml(value) {
+  return String(value ?? "").replace(/[&<>"']/g, (char) => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    "\"": "&quot;",
+    "'": "&#39;"
+  })[char]);
+}
+
+function formatDisplayDate(value) {
+  if (!value) return "-";
+  const date = new Date(`${value}T00:00:00`);
+  if (Number.isNaN(date.getTime())) return value;
+  return date.toLocaleDateString("en-GB");
+}
+
+function buildOfficialInvoiceHtml(savedRequest, invoice, reference) {
+  const serviceNames = savedRequest.serviceNames && savedRequest.serviceNames.length
+    ? savedRequest.serviceNames
+    : [invoice.selected.name];
+  const invoiceDateText = new Date().toLocaleDateString("en-GB");
+  const startDateText = formatDisplayDate(savedRequest.startDate);
+  const itemRows = serviceNames.map((name, index) => {
+    const itemCode = String(name).split(/\s+/).map((part) => part[0]).join("").slice(0, 4).toUpperCase() || "SVC";
+    const isPrimary = index === 0;
+    const price = isPrimary ? invoice.supplierCost : 0;
+    const unit = isPrimary ? invoice.quantity : 1;
+    const extended = isPrimary ? invoice.supplierCost : 0;
+    return `
+      <tr>
+        <td>${index + 1}</td>
+        <td>${escapeHtml(itemCode)}</td>
+        <td>${escapeHtml(name)}</td>
+        <td class="amount">$${price.toLocaleString("en-US")}.00</td>
+        <td>${unit}</td>
+        <td>${escapeHtml(savedRequest.duration || "-")}</td>
+        <td class="amount">$${extended.toLocaleString("en-US")}.00</td>
+      </tr>`;
+  }).join("");
+
+  return `<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>${escapeHtml(reference)} - PTR Connect Invoice</title>
+  <style>
+    @page { size: A4; margin: 12mm; }
+    * { box-sizing: border-box; }
+    body { margin: 0; color: #111; font-family: Arial, Helvetica, sans-serif; background: #f2f4f8; }
+    .print-actions { display: flex; gap: 10px; justify-content: center; padding: 14px; }
+    .print-actions button { border: 0; border-radius: 8px; padding: 11px 18px; color: #fff; background: #0a66ff; font-weight: 800; cursor: pointer; }
+    .sheet { width: 210mm; min-height: 297mm; margin: 0 auto 24px; padding: 17mm 14mm 14mm; background: #fff; box-shadow: 0 18px 50px rgba(15, 23, 42, .14); }
+    .top { display: grid; grid-template-columns: 1fr 92mm; gap: 18mm; align-items: start; }
+    .brand { text-align: center; padding-top: 5mm; }
+    .brand-mark { color: #0a66ff; font-size: 28px; font-weight: 1000; letter-spacing: .08em; }
+    .brand-name { color: #07184f; font-size: 22px; font-weight: 1000; letter-spacing: .06em; }
+    .brand-name em { color: #7b2cff; font-style: normal; }
+    .brand small { display: block; margin-top: 3mm; color: #5b6472; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; }
+    .quotation { border: 2px solid #111; }
+    .quotation h1 { margin: 0; padding: 5px; background: #c9c9c9; border-bottom: 2px solid #111; text-align: center; font-size: 26px; line-height: 1; }
+    .meta { display: grid; grid-template-columns: 42% 58%; }
+    .meta div { min-height: 28px; padding: 7px 8px; border-bottom: 1px solid #111; font-size: 18px; }
+    .meta div:nth-child(odd) { border-right: 1px solid #111; }
+    .meta div:nth-last-child(-n+2) { border-bottom: 0; }
+    .meta b { font-size: 18px; }
+    .bill-line { display: grid; grid-template-columns: 42mm 1fr 60mm; gap: 12mm; align-items: center; margin-top: 18mm; }
+    .label { padding: 5px 8px; background: #c9c9c9; text-align: center; font-size: 19px; }
+    .bill-name { text-align: center; font-size: 18px; }
+    .line { margin: 12mm 0 12mm; border-top: 1px solid #111; width: 92mm; }
+    table { border-collapse: collapse; width: 100%; table-layout: fixed; }
+    th { background: #c9c9c9; border: 1px solid #111; padding: 7px 4px; font-size: 16px; }
+    td { border-left: 1px solid #111; border-right: 1px solid #111; padding: 8px 5px; font-size: 17px; vertical-align: top; }
+    tbody tr:last-child td { height: 88mm; }
+    .center { text-align: center; }
+    .amount { text-align: right; }
+    .currency { width: 12px; text-align: center; }
+    .summary { display: grid; grid-template-columns: 1fr 58mm; border: 1px solid #111; border-top: 0; }
+    .comment { min-height: 34mm; padding: 18mm 0 0 0; font-size: 18px; }
+    .comment b { margin-left: 24mm; }
+    .totals { border-left: 1px solid #111; }
+    .totals-row { display: grid; grid-template-columns: 1fr; min-height: 18mm; align-items: center; padding: 0 8px; background: #c9c9c9; border-bottom: 1px solid #111; font-size: 18px; font-weight: 800; text-align: right; }
+    .balance { display: grid; grid-template-columns: 1fr 58mm; border: 1px solid #111; border-top: 0; }
+    .signature { padding: 5px; font-size: 18px; }
+    .balance-label { padding: 5px; text-align: right; font-size: 18px; font-weight: 900; }
+    .balance-amount { padding: 5px 10px; background: #b8b8b8; text-align: right; font-size: 18px; font-weight: 900; }
+    .footer { margin-top: 22mm; text-align: center; font-family: Georgia, 'Times New Roman', serif; font-size: 13px; line-height: 1.7; }
+    .footer a { color: #0645ad; }
+    .note { margin-top: 7mm; color: #5b6472; font-family: Arial, Helvetica, sans-serif; font-size: 10px; line-height: 1.4; text-align: center; }
+    @media screen {
+      body { background: #eef3fb; }
+      .sheet { width: 100%; min-height: auto; margin: 0 auto 18px; padding: 22px 18px; }
+      .top { grid-template-columns: minmax(0, 1fr) 280px; gap: 24px; }
+      .brand { padding-top: 0; }
+      .brand-mark { font-size: 22px; }
+      .brand-name { font-size: 17px; }
+      .quotation h1 { font-size: 21px; }
+      .meta div, .meta b { font-size: 14px; }
+      .bill-line { grid-template-columns: 130px 1fr 160px; gap: 18px; margin-top: 28px; }
+      .label { font-size: 15px; }
+      .bill-name { font-size: 14px; }
+      .line { width: 58%; margin: 22px 0; }
+      th { font-size: 12px; padding: 6px 3px; }
+      td { font-size: 12px; padding: 6px 4px; }
+      tbody tr:last-child td { height: 260px; }
+      .comment, .signature, .balance-label, .balance-amount, .totals-row { font-size: 13px; }
+      .comment { min-height: 96px; padding-top: 42px; }
+      .footer { margin-top: 28px; font-size: 11px; }
+    }
+    @media print {
+      body { background: #fff; }
+      .print-actions { display: none; }
+      .sheet { margin: 0; box-shadow: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="print-actions">
+    <button onclick="window.print()">Print / Save as PDF</button>
+    <button onclick="window.close()">Close</button>
+  </div>
+  <main class="sheet">
+    <section class="top">
+      <div class="brand">
+        <div class="brand-mark">PTR</div>
+        <div class="brand-name">PTRCONNECT<em>.online</em></div>
+        <small>Your Trusted Gateway</small>
+      </div>
+      <div class="quotation">
+        <h1>Quotation</h1>
+        <div class="meta">
+          <div>INVOICE #</div><div><b>${escapeHtml(reference.replace("INV-", ""))}</b></div>
+          <div>INVOICE DATE</div><div><b>${escapeHtml(invoiceDateText)}</b></div>
+          <div>Ref</div><div><b>${escapeHtml(savedRequest.name || "Customer")}</b></div>
+        </div>
+      </div>
+    </section>
+    <section class="bill-line">
+      <div class="label">BILL TO:</div>
+      <div class="bill-name">${escapeHtml(savedRequest.name || "Customer")}</div>
+      <div class="label">GUEST NAME:</div>
+    </section>
+    <div class="bill-name">${escapeHtml(savedRequest.contact || savedRequest.loginEmail || "")}</div>
+    <div class="line"></div>
+    <table>
+      <thead>
+        <tr>
+          <th style="width:16%">SALESPERSON</th>
+          <th style="width:30%">VOUCHER #</th>
+          <th style="width:16%">ROOM</th>
+          <th style="width:12%">CHECK IN</th>
+          <th style="width:14%">CHECK OUT</th>
+          <th style="width:12%">PAGE</th>
+        </tr>
+        <tr>
+          <th>PTR Connect</th>
+          <th>${escapeHtml(reference)}</th>
+          <th>${escapeHtml(savedRequest.destination || "-")}</th>
+          <th>${escapeHtml(startDateText)}</th>
+          <th>${escapeHtml(savedRequest.duration || "-")}</th>
+          <th>1</th>
+        </tr>
+        <tr>
+          <th style="width:7%">No</th>
+          <th style="width:13%">ITEM NO.</th>
+          <th style="width:31%">DESCRIPTION</th>
+          <th style="width:15%">PRICE</th>
+          <th style="width:9%">UNIT</th>
+          <th style="width:12%">EXTENDED</th>
+          <th style="width:13%">Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${itemRows}
+        <tr>
+          <td>F</td>
+          <td>FEE</td>
+          <td>Agency coordination service fee</td>
+          <td class="amount">$${invoice.agencyFee.toLocaleString("en-US")}.00</td>
+          <td>1</td>
+          <td>-</td>
+          <td class="amount">$${invoice.agencyFee.toLocaleString("en-US")}.00</td>
+        </tr>
+      </tbody>
+    </table>
+    <section class="summary">
+      <div class="comment">COMMENT: <b>Thank You !</b></div>
+      <div class="totals">
+        <div class="totals-row">SALE AMOUNT&nbsp;&nbsp; ${money.format(invoice.supplierCost)}</div>
+        <div class="totals-row">TOTAL AMOUNT&nbsp;&nbsp; ${money.format(invoice.total)}</div>
+        <div class="totals-row">Deposit</div>
+      </div>
+    </section>
+    <section class="balance">
+      <div class="signature">GUEST'S SIGNATURE</div>
+      <div class="balance-label">BALANCE DUE (USD)</div>
+      <div class="balance-amount">${money.format(invoice.total)}</div>
+    </section>
+    <footer class="footer">
+      <div>${escapeHtml(registeredCompany.name)}</div>
+      <div>Registered tax branch: ${escapeHtml(registeredCompany.taxBranch)} | TIN: ${escapeHtml(registeredCompany.taxId)}</div>
+      <div>Registered date: ${escapeHtml(registeredCompany.registeredDate)} | Address: ${escapeHtml(registeredCompany.address)}</div>
+      <div>${escapeHtml(registeredCompany.addressKhmer)}</div>
+      <div>Tel: ${escapeHtml(registeredCompany.phone)} - Email: ${escapeHtml(registeredCompany.email)}</div>
+      <a href="https://${escapeHtml(registeredCompany.website)}">${escapeHtml(registeredCompany.website)}</a>
+      <p class="note">Payment is requested only after customer invoice approval. Live Visa or Mastercard entry must be completed through the approved hosted checkout or secure iframe.</p>
+    </footer>
+  </main>
+</body>
+</html>`;
+}
+
+function openOfficialInvoicePdf() {
+  const savedRequest = JSON.parse(localStorage.getItem("latestBookingRequest") || "{}");
+  const invoice = getCurrentInvoice();
+  const reference = invoiceReference?.textContent && invoiceReference.textContent !== "Pending record"
+    ? invoiceReference.textContent
+    : `INV-${Date.now().toString().slice(-6)}`;
+  const html = buildOfficialInvoiceHtml(savedRequest, invoice, reference);
+
+  if (printInvoicePreview) {
+    printInvoicePreview.hidden = false;
+    printInvoicePreview.innerHTML = `
+      <div class="summary-top">
+        <strong>Official invoice PDF preview</strong>
+        <span>
+          <button class="button primary" type="button" onclick="printOfficialInvoiceFrame()">Print / Save PDF</button>
+          <button class="button secondary" type="button" onclick="closeOfficialInvoicePreview()">Close Preview</button>
+        </span>
+      </div>
+      <iframe id="officialInvoiceFrame" title="Official invoice preview"></iframe>
+    `;
+    const frame = printInvoicePreview.querySelector("#officialInvoiceFrame");
+    frame.srcdoc = html;
+    printInvoicePreview.scrollIntoView({ behavior: "smooth", block: "center" });
+    requestStatus.textContent = "Official invoice preview opened. Press Print / Save PDF to save it as PDF.";
+    requestStatus.classList.add("success");
+    return;
+  }
+}
+
+window.printOfficialInvoiceFrame = function printOfficialInvoiceFrame() {
+  const frame = document.querySelector("#officialInvoiceFrame");
+  if (!frame || !frame.contentWindow) return;
+  frame.contentWindow.focus();
+  frame.contentWindow.print();
+};
+
+window.closeOfficialInvoicePreview = function closeOfficialInvoicePreview() {
+  if (!printInvoicePreview) return;
+  printInvoicePreview.hidden = true;
+  printInvoicePreview.innerHTML = "";
+};
 
 serviceSelect.addEventListener("change", () => {
   quantityInput.value = "1";
@@ -3667,8 +4109,13 @@ if (invoiceReviewButton) {
       whatsAppNotifyButton.href = `https://wa.me/${adminWhatsAppNumber}?text=${whatsappText}`;
       whatsAppNotifyButton.hidden = false;
     }
+    if (pdfInvoiceButton) pdfInvoiceButton.hidden = false;
     if (payNowButton) payNowButton.hidden = false;
   });
+}
+
+if (pdfInvoiceButton) {
+  pdfInvoiceButton.addEventListener("click", openOfficialInvoicePdf);
 }
 
 if (payNowButton) {
