@@ -2202,6 +2202,423 @@ input:disabled {
   margin-top: 34px;
 }
 
+/* Reference-style homepage header and hero refinements. */
+.hero {
+  display: none;
+}
+
+.site-header {
+  max-width: 1220px;
+  min-height: 96px;
+  margin: 0 auto;
+  padding: 18px 28px;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: none;
+}
+
+.brand {
+  gap: 12px;
+  min-width: 250px;
+}
+
+.brand-mark {
+  position: relative;
+  width: 88px;
+  height: 54px;
+  border-radius: 0;
+  background: transparent;
+  color: transparent;
+  box-shadow: none;
+}
+
+.brand-mark::before {
+  position: absolute;
+  inset: 0;
+  color: transparent;
+  background: linear-gradient(135deg, #0078ff 10%, #8a2cff 88%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  content: "PTR";
+  font-size: 42px;
+  font-weight: 1000;
+  line-height: 0.86;
+  letter-spacing: 0;
+  transform: skewX(-8deg);
+}
+
+.brand strong {
+  color: var(--navy);
+  font-size: 20px;
+  line-height: 0.98;
+  letter-spacing: 0.05em;
+}
+
+.brand strong span,
+.brand small {
+  color: #7b2cff;
+}
+
+.brand small {
+  margin-top: 4px;
+  color: #07184f;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.nav-links {
+  gap: clamp(14px, 1.8vw, 24px);
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.nav-links a:first-child {
+  position: relative;
+  color: var(--electric);
+}
+
+.nav-links a:first-child::after {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -13px;
+  height: 3px;
+  border-radius: 999px;
+  background: var(--electric);
+  content: "";
+}
+
+.language-select {
+  color: var(--navy);
+  font-size: 14px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.header-request {
+  min-width: 150px;
+  min-height: 48px;
+  border-radius: 9px;
+  background: linear-gradient(135deg, var(--electric), var(--violet));
+}
+
+.header-request::before {
+  content: "↗ ";
+}
+
+.booking-dashboard {
+  padding-top: 0;
+  background:
+    radial-gradient(circle at 76% 28%, rgba(10, 102, 255, 0.13), transparent 31%),
+    linear-gradient(180deg, #fff 0%, #f8fbff 56%, #fff 100%);
+}
+
+.dashboard-hero {
+  min-height: 540px;
+  margin-bottom: 12px;
+  padding: 38px clamp(24px, 4vw, 36px) 14px;
+}
+
+.dashboard-hero::after {
+  display: none;
+}
+
+.dashboard-hero::before {
+  inset: 8% -1% auto 42%;
+  height: 370px;
+  opacity: 0.72;
+  background-image:
+    radial-gradient(circle, rgba(10, 102, 255, 0.22) 1px, transparent 1.65px),
+    linear-gradient(120deg, transparent 18%, rgba(10, 102, 255, 0.18) 18.3%, transparent 19.2%, transparent 47%, rgba(123, 44, 255, 0.18) 47.4%, transparent 48.4%, transparent 74%, rgba(10, 102, 255, 0.16) 74.3%, transparent 75%);
+  background-size: 12px 12px, 100% 100%;
+}
+
+.dashboard-hero .eyebrow {
+  font-size: 15px;
+  letter-spacing: 0.2em;
+}
+
+.dashboard-hero h2 {
+  max-width: 500px;
+  font-size: clamp(50px, 6vw, 72px);
+  line-height: 1.02;
+}
+
+.dashboard-hero p {
+  max-width: 470px;
+  font-size: 18px;
+  line-height: 1.62;
+}
+
+.hero-wordmark {
+  position: absolute;
+  z-index: 2;
+  right: clamp(30px, 8vw, 106px);
+  top: 112px;
+  width: min(48%, 560px);
+  text-align: center;
+  pointer-events: none;
+}
+
+.hero-wordmark strong {
+  display: block;
+  color: transparent;
+  background: linear-gradient(135deg, #0078ff 4%, #8a2cff 84%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  font-size: clamp(118px, 16vw, 220px);
+  font-weight: 1000;
+  line-height: 0.82;
+  letter-spacing: 0;
+  transform: skewX(-8deg);
+  filter: drop-shadow(0 18px 32px rgba(10, 102, 255, 0.14));
+}
+
+.hero-wordmark span {
+  display: block;
+  margin-top: 8px;
+  color: var(--navy);
+  font-size: clamp(28px, 4vw, 54px);
+  font-weight: 1000;
+  letter-spacing: 0.03em;
+}
+
+.hero-wordmark em {
+  color: #7b2cff;
+  font-style: normal;
+}
+
+.booking-search {
+  margin-top: 32px;
+  padding: 0;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.booking-search label {
+  padding: 18px 26px;
+}
+
+.booking-search .button {
+  min-height: 76px;
+  border-radius: 0 14px 14px 0;
+}
+
+.home-service-grid {
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.home-service-card {
+  min-height: 164px;
+  padding: 26px 24px;
+  border-radius: 16px;
+}
+
+.trust-strip {
+  margin-bottom: 18px;
+  border-radius: 14px;
+}
+
+.contact-section {
+  padding-bottom: 20px;
+}
+
+.footer-trust {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1px;
+  max-width: var(--page-width);
+  margin: 0 auto;
+  overflow: hidden;
+  border-radius: 14px 14px 0 0;
+  background: rgba(10, 102, 255, 0.14);
+  box-shadow: 0 18px 44px rgba(7, 24, 79, 0.06);
+}
+
+.footer-trust article {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 16px;
+  align-items: start;
+  min-height: 112px;
+  padding: 22px 28px;
+  background: #eef5ff;
+}
+
+.footer-trust-icon {
+  display: grid;
+  width: 46px;
+  height: 46px;
+  place-items: center;
+  border: 2px solid rgba(10, 102, 255, 0.18);
+  border-radius: 14px;
+  color: var(--electric);
+  font-size: 22px;
+  font-weight: 900;
+}
+
+.footer-trust strong {
+  display: block;
+  color: var(--navy);
+  font-size: 14px;
+}
+
+.footer-trust p {
+  margin: 6px 0 0;
+  color: #344775;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.site-footer {
+  grid-template-columns: minmax(220px, 0.9fr) minmax(720px, 2.1fr);
+  max-width: var(--page-width);
+  margin: 0 auto;
+  padding: 36px 0 28px;
+  border-top: 0;
+  box-shadow: none;
+}
+
+.footer-brand {
+  padding: 0 34px 0 8px;
+  border-right: 1px solid rgba(10, 102, 255, 0.14);
+}
+
+.footer-brand p,
+.footer-contact p,
+.footer-company p {
+  color: #344775;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.footer-logo {
+  display: grid;
+  gap: 2px;
+  width: fit-content;
+  color: var(--navy);
+}
+
+.footer-logo span {
+  display: block;
+  margin: 0;
+  color: transparent;
+  background: linear-gradient(135deg, #0078ff, #8a2cff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  font-size: 54px;
+  font-weight: 1000;
+  line-height: 0.82;
+  transform: skewX(-8deg);
+}
+
+.footer-logo strong {
+  color: var(--navy);
+  font-size: 22px;
+  letter-spacing: 0.04em;
+}
+
+.footer-logo em {
+  color: #7b2cff;
+  font-style: normal;
+}
+
+.footer-logo small {
+  color: #07184f;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.footer-social {
+  display: flex;
+  gap: 16px;
+  margin-top: 18px;
+}
+
+.footer-social a {
+  color: var(--navy);
+  font-weight: 900;
+}
+
+.footer-columns {
+  grid-template-columns: 0.78fr 0.9fr 1.12fr 1.35fr;
+  gap: 0;
+}
+
+.footer-columns > nav,
+.footer-contact,
+.footer-company {
+  padding: 0 28px;
+  border-right: 1px solid rgba(10, 102, 255, 0.14);
+}
+
+.footer-company {
+  border-right: 0;
+}
+
+.footer-columns h3 {
+  margin-bottom: 10px;
+  font-size: 14px;
+}
+
+.footer-columns a,
+.footer-contact p,
+.footer-company p {
+  font-size: 13px;
+}
+
+.footer-contact strong,
+.footer-company b {
+  color: var(--navy);
+}
+
+.footer-company > strong {
+  display: block;
+  margin-bottom: 10px;
+  color: var(--electric);
+  font-size: 17px;
+  line-height: 1.2;
+}
+
+.footer-bottom {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr auto;
+  gap: 18px;
+  align-items: center;
+  max-width: var(--page-width);
+  margin: 0 auto;
+  padding: 12px 8px;
+  border-top: 1px solid rgba(10, 102, 255, 0.12);
+  color: #344775;
+  font-size: 12px;
+}
+
+.footer-bottom span:nth-child(2) {
+  color: #0b9f77;
+  font-weight: 900;
+}
+
+.footer-bottom span:nth-child(3) {
+  justify-self: end;
+  color: var(--navy);
+  font-weight: 800;
+}
+
+.footer-bottom a {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border: 1px solid rgba(10, 102, 255, 0.28);
+  border-radius: 999px;
+  color: var(--electric);
+  font-weight: 900;
+}
+
 @media (max-width: 980px) {
   .flow {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -2218,6 +2635,47 @@ input:disabled {
 
   .dashboard-hero {
     min-height: 0;
+  }
+
+  .site-header {
+    flex-wrap: wrap;
+  }
+
+  .footer-trust,
+  .footer-columns,
+  .footer-bottom {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .site-footer {
+    grid-template-columns: 1fr;
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  .footer-brand,
+  .footer-columns > nav,
+  .footer-contact,
+  .footer-company {
+    border-right: 0;
+    padding: 20px;
+  }
+
+  .language-select {
+    display: none;
+  }
+
+  .hero-wordmark {
+    position: relative;
+    right: auto;
+    top: auto;
+    width: 100%;
+    margin-top: 24px;
+    text-align: left;
+  }
+
+  .hero-wordmark strong {
+    font-size: 110px;
   }
 }
 
@@ -2238,9 +2696,43 @@ input:disabled {
     min-width: 0;
   }
 
+  .footer-trust,
+  .footer-columns,
+  .footer-bottom {
+    grid-template-columns: 1fr;
+  }
+
+  .footer-bottom span:nth-child(3) {
+    justify-self: start;
+  }
+
   .brand-mark {
     width: 46px;
     height: 42px;
+  }
+
+  .brand-mark::before {
+    font-size: 30px;
+  }
+
+  .brand strong {
+    font-size: 15px;
+  }
+
+  .site-header {
+    padding: 14px 18px;
+  }
+
+  .dashboard-hero h2 {
+    font-size: 42px;
+  }
+
+  .hero-wordmark strong {
+    font-size: 82px;
+  }
+
+  .hero-wordmark span {
+    font-size: 24px;
   }
 }
 
@@ -2251,20 +2743,22 @@ input:disabled {
       <a class="brand" href="#top" aria-label="PTR Connect home">
         <span class="brand-mark">PTR</span>
         <span>
-          <strong>PTR Connect</strong>
-          <small>ptrconnect.online</small>
+          <strong>PTRCONNECT<span>.online</span></strong>
+          <small>Your Trusted Gateway</small>
         </span>
       </a>
       <nav class="nav-links" aria-label="Primary">
         <a href="#top">Home</a>
-        <a href="#services">Services</a>
+        <a href="#services">Services⌄</a>
         <a href="#destinations">Destinations</a>
         <a href="#request">Business</a>
+        <a href="#company">About Us</a>
+        <a href="#process">Process</a>
+        <a href="#estimate">Fees</a>
         <a href="#company">Company</a>
         <a href="#contact">Contact</a>
-        <a href="#estimate">Fees</a>
-        <a href="#process">Process</a>
       </nav>
+      <span class="language-select" aria-label="Language">◎ EN⌄</span>
       <a class="button primary header-request" href="#request">Submit Request</a>
     </header>
 
@@ -2294,6 +2788,10 @@ input:disabled {
           <div class="hero-actions">
             <a class="button primary" href="#services">Explore Services</a>
             <a class="button secondary" href="#process">How It Works</a>
+          </div>
+          <div class="hero-wordmark" aria-hidden="true">
+            <strong>PTR</strong>
+            <span>PTRCONNECT<em>.online</em></span>
           </div>
           <form class="booking-search" action="#request">
             <label>
@@ -2750,7 +3248,7 @@ input:disabled {
         </div>
       </section>
 
-      <section id="contact" class="info-section" aria-label="Contact support">
+      <section id="contact" class="info-section contact-section" aria-label="Contact support">
         <div class="section-copy narrow">
           <p class="eyebrow">Contact</p>
           <h2>PTR Connect support is available for booking and invoice review.</h2>
@@ -2759,38 +3257,85 @@ input:disabled {
       </section>
     </main>
 
+    <section class="footer-trust" aria-label="PTR Connect compliance and support summary">
+      <article>
+        <span class="footer-trust-icon">♙</span>
+        <div><strong>AML / KYC Compliant</strong><p>We follow international AML/CFT guidance and documentation standards.</p></div>
+      </article>
+      <article>
+        <span class="footer-trust-icon">▣</span>
+        <div><strong>Data Protection</strong><p>Your personal information is kept confidential and used only for service processing.</p></div>
+      </article>
+      <article>
+        <span class="footer-trust-icon">✧</span>
+        <div><strong>Trusted & Professional</strong><p>We are committed to transparency, responsibility, and customer satisfaction.</p></div>
+      </article>
+      <article>
+        <span class="footer-trust-icon">◎</span>
+        <div><strong>Global Network</strong><p>We work with trusted suppliers and partners worldwide to serve you better.</p></div>
+      </article>
+    </section>
+
     <footer class="site-footer">
       <div class="footer-brand">
-        <strong>PTR Connect</strong>
-        <span>Travel | Business | Investment. Operated with registered company support, itemized invoices, secure checkout readiness, and AML/KYC procedures.</span>
+        <a class="footer-logo" href="#top" aria-label="PTR Connect home">
+          <span>PTR</span>
+          <strong>PTRCONNECT<em>.online</em></strong>
+          <small>Your Trusted Gateway</small>
+        </a>
+        <p>PTR Connect coordinates Cambodia travel, business, and investment services through verified suppliers, itemized invoices, and secure payment procedures.</p>
+        <div class="footer-social" aria-label="Social links">
+          <a href="#contact">f</a>
+          <a href="#contact">◎</a>
+          <a href="#contact">↗</a>
+          <a href="#contact">☏</a>
+        </div>
       </div>
       <div class="footer-columns">
-        <nav aria-label="About PTR Connect">
-          <h3>About</h3>
-          <a href="#company">Company information</a>
-          <a href="#platform-roadmap">Platform roadmap</a>
-          <a href="#estimate">What we sell</a>
-          <a href="#process">How booking works</a>
-          <a href="#request">Confirm to Pay</a>
-          <a href="#contact">Corporate contact</a>
+        <nav aria-label="Quick links">
+          <h3>Quick Links</h3>
+          <a href="#top">Home</a>
+          <a href="#services">Services</a>
+          <a href="#destinations">Destinations</a>
+          <a href="#request">Business</a>
+          <a href="#process">Process</a>
+          <a href="#estimate">Fees</a>
+          <a href="#company">Company</a>
+          <a href="#contact">Contact</a>
         </nav>
-        <nav aria-label="Terms and settings">
-          <h3>Terms and settings</h3>
-          <a href="#policy-summary">Privacy Notice</a>
-          <a href="#policy-summary">Terms of Service</a>
-          <a href="#policy-summary">Refund Policy</a>
+        <nav aria-label="Resources">
+          <h3>Resources</h3>
+          <a href="#process">How It Works</a>
           <a href="#policy-summary">Payment Policy</a>
+          <a href="#policy-summary">Terms & Conditions</a>
+          <a href="#policy-summary">Privacy Policy</a>
+          <a href="#policy-summary">Refund & Cancellation</a>
           <a href="#compliance">AML / KYC Procedure</a>
+          <a href="#contact">FAQ</a>
         </nav>
-        <nav aria-label="Customer support">
-          <h3>Support</h3>
-          <a href="#request">Booking request</a>
-          <a href="#request">Confirm to Pay</a>
-          <a href="#request">Website feedback</a>
-          <a href="#contact">Contact support</a>
-        </nav>
+        <div class="footer-contact" aria-label="Contact us">
+          <h3>Contact Us</h3>
+          <p><strong>Email:</strong> info@ptrconnect.online</p>
+          <p><strong>Phone / WhatsApp:</strong> +855 86 301 033</p>
+          <p><strong>Address:</strong> Phnom Penh, Cambodia</p>
+          <p><strong>Working Hours:</strong><br />Mon - Fri: 8:30 AM - 5:30 PM<br />(Saturday: by appointment)</p>
+        </div>
+        <div class="footer-company" aria-label="Registered company support">
+          <h3>Operated with registered company support from</h3>
+          <strong>PRATHNA KASEKOR KHMER IMPORT EXPORT CO., LTD.</strong>
+          <p><b>Legal Form:</b> Private Limited Company</p>
+          <p><b>Incorporated:</b> Cambodia, 19 May 2025</p>
+          <p><b>Tax Registration:</b> From 20 May 2025</p>
+          <p><b>Activity:</b> Travel, Business & Investment Coordination Services</p>
+        </div>
       </div>
     </footer>
+    <div class="footer-bottom">
+      <span>© 2026 PTR Connect. All rights reserved.</span>
+      <span>⊙ Verified Platform</span>
+      <span>Your Trusted Gateway</span>
+      <a href="#top" aria-label="Back to top">↑</a>
+    </div>
 
     <script>
 const serviceSelect = document.querySelector("#serviceSelect");
