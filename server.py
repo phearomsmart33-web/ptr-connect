@@ -3,9 +3,11 @@ import os
 import secrets
 from datetime import datetime, timezone
 
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, redirect, request, session
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
+from authlib.integrations.flask_client import OAuth
+from urllib.parse import quote
 
 app = Flask(__name__)
 database_url = os.environ.get("DATABASE_URL", "sqlite:///ptrconnect.db")
@@ -15,8 +17,20 @@ app.config.update(
     SQLALCHEMY_DATABASE_URI=database_url,
     SQLALCHEMY_TRACK_MODIFICATIONS=False,
     SECRET_KEY=os.environ.get("SECRET_KEY") or secrets.token_hex(32),
+    SESSION_COOKIE_SECURE=True,
+    SESSION_COOKIE_HTTPONLY=True,
+    SESSION_COOKIE_SAMESITE="Lax",
 )
 db = SQLAlchemy(app)
+oauth = OAuth(app)
+google = oauth.register(
+    name="google",
+    client_id=os.environ.get("GOOGLE_CLIENT_ID"),
+    client_secret=os.environ.get("GOOGLE_CLIENT_SECRET"),
+    server_metadata_url="https://accounts.google.com/.well-known/openid-configuration",
+    client_kwargs={"scope": "openid email profile"},
+)
+FRONTEND_URL = "https://www.ptrconnect.online"
 CORS(app, resources={r"/api/*": {"origins": [
     "https://www.ptrconnect.online", "https://ptrconnect.online"
 ]}})
@@ -74,19 +88,37 @@ def require_user():
     return user, None if user else (jsonify(error="Authentication required"), 401)
 
 @app.get("/api/health")
-def health(): return jsonify(ok=True, database="connected", payment="pending")
+def health(): return jsonify(ok=True, database="connected", payment="pending", google_auth=bool(os.environ.get("GOOGLE_CLIENT_ID") and os.environ.get("GOOGLE_CLIENT_SECRET")))
 
-@app.post("/api/login")
-def login():
-    email = str((request.get_json(silent=True) or {}).get("email", "")).strip().lower()
-    if "@" not in email: return jsonify(error="Valid email required"), 400
-    user = User.query.filter_by(email=email).first()
-    if not user:
-        user = User(email=email); db.session.add(user); db.session.flush()
+def issue_session_token(user):
     token = secrets.token_urlsafe(32)
     db.session.add(Session(token_hash=hashlib.sha256(token.encode()).hexdigest(), user_id=user.id))
     db.session.commit()
-    return jsonify(token=token, email=email), 201
+    return token
+
+@app.get("/auth/google")
+def google_login():
+    if not os.environ.get("GOOGLE_CLIENT_ID") or not os.environ.get("GOOGLE_CLIENT_SECRET"):
+        return jsonify(error="Google authentication is not configured"), 503
+    session["oauth_nonce"] = secrets.token_urlsafe(16)
+    return google.authorize_redirect("https://ptr-connect-api.onrender.com/auth/google/callback", nonce=session["oauth_nonce"])
+
+@app.get("/auth/google/callback")
+def google_callback():
+    token_data = google.authorize_access_token()
+    profile = google.parse_id_token(token_data, nonce=session.pop("oauth_nonce", None))
+    if not profile or not profile.get("email") or not profile.get("email_verified"):
+        return redirect(FRONTEND_URL + "/#auth_error=unverified")
+    email = profile["email"].lower()
+    user = User.query.filter_by(email=email).first()
+    if not user:
+        user = User(email=email); db.session.add(user); db.session.flush()
+    login_token = issue_session_token(user)
+    return redirect(f"{FRONTEND_URL}/#auth_token={quote(login_token)}&email={quote(email)}")
+
+@app.post("/api/login")
+def login():
+    return jsonify(error="Use Sign in with Google"), 410
 
 @app.route("/api/bookings", methods=["GET", "POST"])
 def bookings():
