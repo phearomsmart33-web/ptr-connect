@@ -3564,6 +3564,7 @@ input:disabled {
 
     <script>
 const serviceSelect = document.querySelector("#serviceSelect");
+const API_BASE = "https://ptr-connect-api.onrender.com";
 const quantityInput = document.querySelector("#quantityInput");
 const quantityLabel = document.querySelector("#quantityLabel");
 const estimateValue = document.querySelector("#estimateValue");
@@ -4147,7 +4148,7 @@ if (loginForm) {
     if (!email) return;
 
     try {
-      const response = await fetch("/api/login", {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({email})});
+      const response = await fetch(`${API_BASE}/api/login`, {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({email})});
       const result = await response.json();
       if (!response.ok) throw new Error(result.error || "Login failed");
       localStorage.setItem("ptrApiToken", result.token);
@@ -4221,7 +4222,7 @@ if (requestForm) {
     };
 
     try {
-      const response = await fetch("/api/bookings", {method:"POST", headers:{"Content-Type":"application/json","Authorization":`Bearer ${localStorage.getItem("ptrApiToken") || ""}`}, body:JSON.stringify(savedRequest)});
+      const response = await fetch(`${API_BASE}/api/bookings`, {method:"POST", headers:{"Content-Type":"application/json","Authorization":`Bearer ${localStorage.getItem("ptrApiToken") || ""}`}, body:JSON.stringify(savedRequest)});
       const result = await response.json();
       if (!response.ok) throw new Error(result.error || "Could not save booking");
       savedRequest.reference = result.reference;
