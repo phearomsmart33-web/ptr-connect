@@ -3469,6 +3469,17 @@ input:disabled {
           </p>
         </form>
       </section>
+      <section class="section" id="customerDashboard" aria-label="Customer dashboard">
+        <div class="section-heading">
+          <p class="eyebrow">Customer Dashboard</p>
+          <h2>Your booking and invoice history.</h2>
+          <p>Records are stored on this device until the secure server database is connected.</p>
+        </div>
+        <div class="login-panel">
+          <div class="summary-top"><strong id="dashboardUser">Please login to view your records.</strong><button class="button secondary" id="logoutButton" type="button" hidden>Logout</button></div>
+          <div id="historyList" class="activity-row" aria-live="polite"><p>No booking records yet.</p></div>
+        </div>
+      </section>
     </main>
 
     <section class="footer-trust" aria-label="PTR Connect compliance and support summary">
@@ -3582,6 +3593,9 @@ const invoiceApprovalStatus = document.querySelector("#invoiceApprovalStatus");
 const securePaymentButton = document.querySelector("#securePaymentButton");
 const securePaymentNotice = document.querySelector("#securePaymentNotice");
 const printInvoicePreview = document.querySelector("#printInvoicePreview");
+const dashboardUser = document.querySelector("#dashboardUser");
+const historyList = document.querySelector("#historyList");
+const logoutButton = document.querySelector("#logoutButton");
 const mobileMenuToggle = document.querySelector(".mobile-menu-toggle");
 const mobileNavigation = document.querySelector("#mobileNavigation");
 const mobileMenuBackdrop = document.querySelector(".mobile-menu-backdrop");
@@ -4077,6 +4091,29 @@ function getSavedLogin() {
   }
 }
 
+function getBookingHistory() {
+  try { return JSON.parse(localStorage.getItem("ptrBookingHistory") || "[]"); }
+  catch { return []; }
+}
+
+function renderCustomerDashboard() {
+  const login = getSavedLogin();
+  const history = getBookingHistory().filter((item) => login && item.loginEmail === login.email);
+  if (dashboardUser) dashboardUser.textContent = login ? `Account: ${login.email}` : "Please login to view your records.";
+  if (logoutButton) logoutButton.hidden = !login;
+  if (!historyList) return;
+  if (!login || !history.length) {
+    historyList.innerHTML = `<p>${login ? "No booking records yet." : "Login to view booking and invoice history."}</p>`;
+    return;
+  }
+  historyList.innerHTML = history.slice().reverse().map((item) => `
+    <article>
+      <strong>${item.reference || "Booking pending invoice"}</strong>
+      <p>${(item.serviceNames || []).join(" + ") || item.service || "Service request"}</p>
+      <small>${new Date(item.recordedAt).toLocaleString()} · ${item.status || "RECORDED"}</small>
+    </article>`).join("");
+}
+
 function applyLoginState() {
   const login = getSavedLogin();
   const loggedIn = Boolean(login && login.email);
@@ -4092,19 +4129,34 @@ function applyLoginState() {
   if (requestStatus && !loggedIn) {
     requestStatus.textContent = "Login first, then record booking details for invoice review before payment.";
   }
+  renderCustomerDashboard();
 }
 
+if (logoutButton) logoutButton.addEventListener("click", () => {
+  localStorage.removeItem("rtpConnectLogin");
+  localStorage.removeItem("ptrApiToken");
+  setInvoiceApprovalState(false, false);
+  applyLoginState();
+});
+
 if (loginForm) {
-  loginForm.addEventListener("submit", (event) => {
+  loginForm.addEventListener("submit", async (event) => {
     event.preventDefault();
     const formData = new FormData(loginForm);
     const email = String(formData.get("login_email") || "").trim();
     if (!email) return;
 
-    localStorage.setItem("rtpConnectLogin", JSON.stringify({
-      email,
-      loggedInAt: new Date().toISOString()
-    }));
+    try {
+      const response = await fetch("/api/login", {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({email})});
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || "Login failed");
+      localStorage.setItem("ptrApiToken", result.token);
+    } catch (error) {
+      loginStatus.textContent = `Server login unavailable: ${error.message}`;
+      loginStatus.classList.remove("success");
+      return;
+    }
+    localStorage.setItem("rtpConnectLogin", JSON.stringify({ email, loggedInAt: new Date().toISOString() }));
     applyLoginState();
     requestForm.scrollIntoView({ behavior: "smooth", block: "start" });
   });
@@ -4130,7 +4182,7 @@ document.querySelectorAll(".activity-tabs button").forEach((button) => {
 });
 
 if (requestForm) {
-  requestForm.addEventListener("submit", (event) => {
+  requestForm.addEventListener("submit", async (event) => {
     event.preventDefault();
     const login = getSavedLogin();
     if (!login || !login.email) {
@@ -4168,7 +4220,23 @@ if (requestForm) {
       recordedAt: new Date().toISOString()
     };
 
+    try {
+      const response = await fetch("/api/bookings", {method:"POST", headers:{"Content-Type":"application/json","Authorization":`Bearer ${localStorage.getItem("ptrApiToken") || ""}`}, body:JSON.stringify(savedRequest)});
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || "Could not save booking");
+      savedRequest.reference = result.reference;
+      savedRequest.status = result.status;
+    } catch (error) {
+      requestStatus.textContent = `Booking was not saved: ${error.message}`;
+      requestStatus.classList.remove("success");
+      return;
+    }
+
     localStorage.setItem("latestBookingRequest", JSON.stringify(savedRequest));
+    const history = getBookingHistory();
+    history.push({ ...savedRequest, status: "RECORDED" });
+    localStorage.setItem("ptrBookingHistory", JSON.stringify(history));
+    renderCustomerDashboard();
     requestStatus.textContent = "Booking details recorded. Press Invoice Review to check full invoice conditions before payment.";
     requestStatus.classList.add("success");
     if (invoiceReviewButton) invoiceReviewButton.hidden = false;
@@ -4182,6 +4250,9 @@ if (invoiceReviewButton) {
     const savedRequest = JSON.parse(localStorage.getItem("latestBookingRequest") || "{}");
     const invoice = getCurrentInvoice();
     const reference = `INV-${Date.now().toString().slice(-6)}`;
+    const history = getBookingHistory();
+    const current = history.slice().reverse().find((item) => item.loginEmail === savedRequest.loginEmail && !item.reference);
+    if (current) { current.reference = reference; current.status = "INVOICE READY"; localStorage.setItem("ptrBookingHistory", JSON.stringify(history)); }
 
     if (invoiceReference) invoiceReference.textContent = reference;
     if (invoiceCustomer) invoiceCustomer.textContent = savedRequest.name || "-";
@@ -4208,6 +4279,7 @@ if (invoiceReviewButton) {
       whatsAppNotifyButton.hidden = false;
     }
     if (pdfInvoiceButton) pdfInvoiceButton.hidden = false;
+    renderCustomerDashboard();
   });
 }
 
@@ -4230,6 +4302,10 @@ if (approveInvoiceButton) {
       customer: savedRequest.name,
       approvedAt: new Date().toISOString()
     }));
+    const history = getBookingHistory();
+    const current = history.find((item) => item.reference === (invoiceReference?.textContent || ""));
+    if (current) { current.status = "APPROVED — PAYMENT PENDING"; localStorage.setItem("ptrBookingHistory", JSON.stringify(history)); }
+    renderCustomerDashboard();
     requestStatus.textContent = "Invoice approved. Secure payment handoff is available in preview mode.";
     requestStatus.classList.add("success");
   });
