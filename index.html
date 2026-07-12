@@ -3351,10 +3351,9 @@ input:disabled {
           </p>
           <div class="login-panel" aria-label="Customer account login">
             <strong>Login required before booking</strong>
-            <p>Use your Google account name or email to unlock the booking request.</p>
+            <p>Continue to Google to securely verify your account before booking.</p>
             <form class="login-form" action="#" method="post">
-              <input type="email" name="login_email" placeholder="Google account email" required />
-              <button class="button secondary full" type="submit">Login with Google Account</button>
+              <button class="button secondary full" type="submit">Continue with Google</button>
             </form>
             <div class="request-status" id="loginStatus" role="status" aria-live="polite">
               Please login first to process booking.
@@ -4141,26 +4140,17 @@ if (logoutButton) logoutButton.addEventListener("click", () => {
 });
 
 if (loginForm) {
-  loginForm.addEventListener("submit", async (event) => {
+  loginForm.addEventListener("submit", (event) => {
     event.preventDefault();
-    const formData = new FormData(loginForm);
-    const email = String(formData.get("login_email") || "").trim();
-    if (!email) return;
-
-    try {
-      const response = await fetch(`${API_BASE}/api/login`, {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({email})});
-      const result = await response.json();
-      if (!response.ok) throw new Error(result.error || "Login failed");
-      localStorage.setItem("ptrApiToken", result.token);
-    } catch (error) {
-      loginStatus.textContent = `Server login unavailable: ${error.message}`;
-      loginStatus.classList.remove("success");
-      return;
-    }
-    localStorage.setItem("rtpConnectLogin", JSON.stringify({ email, loggedInAt: new Date().toISOString() }));
-    applyLoginState();
-    requestForm.scrollIntoView({ behavior: "smooth", block: "start" });
+    window.location.assign(`${API_BASE}/auth/google`);
   });
+}
+
+const authParams = new URLSearchParams(window.location.hash.slice(1));
+if (authParams.has("auth_token") && authParams.has("email")) {
+  localStorage.setItem("ptrApiToken", authParams.get("auth_token"));
+  localStorage.setItem("rtpConnectLogin", JSON.stringify({email:authParams.get("email"), loggedInAt:new Date().toISOString()}));
+  history.replaceState(null, "", window.location.pathname + window.location.search);
 }
 
 document.querySelectorAll(".activity-tabs button").forEach((button) => {
