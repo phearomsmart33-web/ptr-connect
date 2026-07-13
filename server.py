@@ -3,12 +3,16 @@ import os
 import secrets
 from datetime import datetime, timezone
 
-from flask import Flask, jsonify, redirect, request, session
+from flask import Flask, jsonify, redirect, request
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 from authlib.integrations.flask_client import OAuth
 from urllib.parse import quote
+from urllib.parse import urlencode
 from werkzeug.middleware.proxy_fix import ProxyFix
+import requests
+from google.auth.transport import requests as google_requests
+from google.oauth2 import id_token
 
 app = Flask(__name__)
 app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1)
@@ -48,6 +52,11 @@ class User(db.Model):
 class Session(db.Model):
     token_hash = db.Column(db.String(64), primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id", ondelete="CASCADE"), nullable=False)
+    created_at = db.Column(db.DateTime(timezone=True), default=now, nullable=False)
+
+class GoogleAuthState(db.Model):
+    state = db.Column(db.String(128), primary_key=True)
+    nonce = db.Column(db.String(128), nullable=False)
     created_at = db.Column(db.DateTime(timezone=True), default=now, nullable=False)
 
 class Booking(db.Model):
@@ -103,19 +112,45 @@ def issue_session_token(user):
 def google_login():
     if not os.environ.get("GOOGLE_CLIENT_ID") or not os.environ.get("GOOGLE_CLIENT_SECRET"):
         return jsonify(error="Google authentication is not configured"), 503
-    session["oauth_nonce"] = secrets.token_urlsafe(16)
-    return google.authorize_redirect(
-        "https://ptr-connect-api.onrender.com/auth/google/callback",
-        nonce=session["oauth_nonce"],
-    )
+    state = secrets.token_urlsafe(32)
+    nonce = secrets.token_urlsafe(32)
+    db.session.add(GoogleAuthState(state=state, nonce=nonce))
+    db.session.commit()
+    params = urlencode({
+        "client_id": os.environ["GOOGLE_CLIENT_ID"],
+        "redirect_uri": "https://ptr-connect-api.onrender.com/auth/google/callback",
+        "response_type": "code",
+        "scope": "openid email profile",
+        "state": state,
+        "nonce": nonce,
+        "prompt": "select_account",
+    })
+    return redirect("https://accounts.google.com/o/oauth2/v2/auth?" + params)
 
 @app.get("/auth/google/callback")
 def google_callback():
-    token_data = google.authorize_access_token()
-    session.pop("oauth_nonce", None)
-    profile = token_data.get("userinfo")
-    if not profile:
-        profile = google.get("userinfo", token=token_data).json()
+    state_value = request.args.get("state", "")
+    code = request.args.get("code", "")
+    saved_state = db.session.get(GoogleAuthState, state_value)
+    if not saved_state or not code:
+        return redirect(FRONTEND_URL + "/#auth_error=invalid_state")
+    nonce = saved_state.nonce
+    db.session.delete(saved_state)
+    db.session.commit()
+    token_response = requests.post("https://oauth2.googleapis.com/token", data={
+        "client_id": os.environ["GOOGLE_CLIENT_ID"],
+        "client_secret": os.environ["GOOGLE_CLIENT_SECRET"],
+        "code": code,
+        "grant_type": "authorization_code",
+        "redirect_uri": "https://ptr-connect-api.onrender.com/auth/google/callback",
+    }, timeout=15)
+    token_response.raise_for_status()
+    token_data = token_response.json()
+    profile = id_token.verify_oauth2_token(
+        token_data["id_token"], google_requests.Request(), os.environ["GOOGLE_CLIENT_ID"]
+    )
+    if profile.get("nonce") != nonce:
+        return redirect(FRONTEND_URL + "/#auth_error=invalid_nonce")
     if not profile or not profile.get("email") or not profile.get("email_verified"):
         return redirect(FRONTEND_URL + "/#auth_error=unverified")
     email = profile["email"].lower()
