@@ -8,8 +8,10 @@ from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 from authlib.integrations.flask_client import OAuth
 from urllib.parse import quote
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 app = Flask(__name__)
+app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1)
 database_url = os.environ.get("DATABASE_URL", "sqlite:///ptrconnect.db")
 if database_url.startswith("postgres://"):
     database_url = database_url.replace("postgres://", "postgresql://", 1)
@@ -19,7 +21,8 @@ app.config.update(
     SECRET_KEY=os.environ.get("SECRET_KEY") or secrets.token_hex(32),
     SESSION_COOKIE_SECURE=True,
     SESSION_COOKIE_HTTPONLY=True,
-    SESSION_COOKIE_SAMESITE="Lax",
+    SESSION_COOKIE_SAMESITE="None",
+    PREFERRED_URL_SCHEME="https",
 )
 db = SQLAlchemy(app)
 oauth = OAuth(app)
