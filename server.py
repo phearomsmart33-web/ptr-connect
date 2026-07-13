@@ -101,12 +101,18 @@ def google_login():
     if not os.environ.get("GOOGLE_CLIENT_ID") or not os.environ.get("GOOGLE_CLIENT_SECRET"):
         return jsonify(error="Google authentication is not configured"), 503
     session["oauth_nonce"] = secrets.token_urlsafe(16)
-    return google.authorize_redirect("https://ptr-connect-api.onrender.com/auth/google/callback", nonce=session["oauth_nonce"])
+    return google.authorize_redirect(
+        "https://ptr-connect-api.onrender.com/auth/google/callback",
+        nonce=session["oauth_nonce"],
+    )
 
 @app.get("/auth/google/callback")
 def google_callback():
     token_data = google.authorize_access_token()
-    profile = google.parse_id_token(token_data, nonce=session.pop("oauth_nonce", None))
+    session.pop("oauth_nonce", None)
+    profile = token_data.get("userinfo")
+    if not profile:
+        profile = google.get("userinfo", token=token_data).json()
     if not profile or not profile.get("email") or not profile.get("email_verified"):
         return redirect(FRONTEND_URL + "/#auth_error=unverified")
     email = profile["email"].lower()
