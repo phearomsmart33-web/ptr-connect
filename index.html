@@ -2892,6 +2892,22 @@ input:disabled {
   margin: 0 0 8px;
 }
 
+.payment-environment-badge {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  margin-bottom: 8px;
+  padding: 5px 10px;
+  border: 1px solid #d97706;
+  border-radius: 999px;
+  color: #92400e;
+  background: #fffbeb;
+  font-size: .76rem;
+  font-weight: 900;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
 .secure-payment-notice strong {
   display: block;
   color: var(--navy);
@@ -3457,8 +3473,9 @@ input:disabled {
             <button class="button secondary full" id="pdfInvoiceButton" type="button" hidden>View / Download PDF Invoice</button>
             <button class="button primary full" id="securePaymentButton" type="button" hidden disabled>Confirm &amp; Proceed to Secure Payment</button>
             <div class="secure-payment-notice" id="securePaymentNotice" role="status" aria-live="polite" hidden>
+              <span class="payment-environment-badge" id="paymentEnvironmentBadge">PayWay Sandbox</span>
               <p>You will be redirected to our approved secure payment provider to select an available payment method.</p>
-              <strong>Secure payment integration pending merchant approval.</strong>
+              <strong id="paymentProviderStatus">Invoice approval is required before PayWay checkout.</strong>
             </div>
             <div class="print-invoice-preview" id="printInvoicePreview" hidden></div>
           </article>
@@ -3472,7 +3489,7 @@ input:disabled {
         <div class="section-heading">
           <p class="eyebrow">Customer Dashboard</p>
           <h2>Your booking and invoice history.</h2>
-          <p>Records are stored on this device until the secure server database is connected.</p>
+          <p>Your authenticated booking records are loaded from the secure server database.</p>
         </div>
         <div class="login-panel">
           <div class="summary-top"><strong id="dashboardUser">Please login to view your records.</strong><button class="button secondary" id="logoutButton" type="button" hidden>Logout</button></div>
@@ -3592,6 +3609,8 @@ const approveInvoiceButton = document.querySelector("#approveInvoiceButton");
 const invoiceApprovalStatus = document.querySelector("#invoiceApprovalStatus");
 const securePaymentButton = document.querySelector("#securePaymentButton");
 const securePaymentNotice = document.querySelector("#securePaymentNotice");
+const paymentEnvironmentBadge = document.querySelector("#paymentEnvironmentBadge");
+const paymentProviderStatus = document.querySelector("#paymentProviderStatus");
 const printInvoicePreview = document.querySelector("#printInvoicePreview");
 const dashboardUser = document.querySelector("#dashboardUser");
 const historyList = document.querySelector("#historyList");
@@ -3602,11 +3621,9 @@ const mobileMenuBackdrop = document.querySelector(".mobile-menu-backdrop");
 const feedbackForm = document.querySelector(".feedback-form");
 const feedbackStatus = document.querySelector("#feedbackStatus");
 const adminWhatsAppNumber = "85586301033";
-const paymentGatewayConfig = Object.freeze({
-  mode: "preview",
-  hostedCheckoutUrl: ""
-});
 let invoiceApproved = false;
+let currentServerInvoice = null;
+let paymentStatusTimer = null;
 
 function setMobileMenuState(open, restoreFocus = false) {
   if (!mobileMenuToggle || !mobileNavigation || !mobileMenuBackdrop) return;
@@ -3661,6 +3678,147 @@ if (mobileMenuToggle && mobileNavigation && mobileMenuBackdrop) {
   }
 }
 
+function setRequestMessage(message, success = false) {
+  if (!requestStatus) return;
+  requestStatus.textContent = message;
+  requestStatus.classList.toggle("success", success);
+}
+
+async function apiRequest(path, options = {}) {
+  const token = localStorage.getItem("ptrApiToken") || "";
+  if (!token) throw new Error("AUTH_REQUIRED");
+
+  const headers = new Headers(options.headers || {});
+  headers.set("Authorization", `Bearer ${token}`);
+  const response = await fetch(`${API_BASE}${path}`, { ...options, headers });
+  const responseText = await response.text();
+  let payload = {};
+  if (responseText) {
+    try { payload = JSON.parse(responseText); }
+    catch { throw new Error("INVALID_SERVER_RESPONSE"); }
+  }
+
+  if (!response.ok) {
+    const error = new Error(response.status === 401 ? "AUTH_REQUIRED" : "API_REQUEST_FAILED");
+    error.status = response.status;
+    error.code = payload.code || "";
+    throw error;
+  }
+  return payload;
+}
+
+function normalizeServerInvoice(payload) {
+  const source = payload && payload.invoice ? payload.invoice : payload;
+  const invoice = {
+    reference: String(source?.reference || "").trim(),
+    status: String(source?.status || "INVOICE READY").trim(),
+    supplierCost: Number(source?.supplierCost),
+    serviceFee: Number(source?.serviceFee),
+    total: Number(source?.total),
+    currency: String(source?.currency || "USD").toUpperCase()
+  };
+  const validCurrency = /^[A-Z]{3}$/.test(invoice.currency);
+  const validAmounts = [invoice.supplierCost, invoice.serviceFee, invoice.total]
+    .every((value) => Number.isFinite(value) && value >= 0);
+  if (!invoice.reference || !validCurrency || !validAmounts) {
+    throw new Error("INVALID_INVOICE_RESPONSE");
+  }
+  return invoice;
+}
+
+function invoiceMoney(value, currency = "USD") {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency,
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  }).format(Number(value));
+}
+
+function renderServerInvoice(invoice, savedRequest = {}) {
+  currentServerInvoice = invoice;
+  if (invoiceReference) invoiceReference.textContent = invoice.reference;
+  if (invoiceCustomer) invoiceCustomer.textContent = savedRequest.name || "-";
+  if (invoiceContact) invoiceContact.textContent = savedRequest.contact || "-";
+  if (invoiceStatusText) invoiceStatusText.textContent = invoice.status;
+  if (summaryService) {
+    summaryService.textContent = savedRequest.serviceNames?.length
+      ? savedRequest.serviceNames.join(" + ")
+      : services[savedRequest.service]?.name || "Service request";
+  }
+  if (invoiceDate) invoiceDate.textContent = new Date().toLocaleDateString("en-GB");
+  if (invoiceSchedule) invoiceSchedule.textContent = `${savedRequest.startDate || "-"} / ${savedRequest.duration || "-"}`;
+  if (invoiceDestination) invoiceDestination.textContent = savedRequest.destination || "-";
+  if (summarySupplier) summarySupplier.textContent = invoiceMoney(invoice.supplierCost, invoice.currency);
+  if (summaryFee) summaryFee.textContent = invoiceMoney(invoice.serviceFee, invoice.currency);
+  if (summaryTotal) summaryTotal.textContent = invoiceMoney(invoice.total, invoice.currency);
+}
+
+function getPrintableServerInvoice(savedRequest) {
+  if (!currentServerInvoice) throw new Error("INVOICE_NOT_READY");
+  const selected = services[savedRequest.service] || services.hotel;
+  return {
+    selected,
+    quantity: Math.max(selected.min, Number(savedRequest.quantity) || selected.min),
+    supplierCost: currentServerInvoice.supplierCost,
+    agencyFee: currentServerInvoice.serviceFee,
+    total: currentServerInvoice.total,
+    currency: currentServerInvoice.currency
+  };
+}
+
+function validatePayWayPaymentLink(value) {
+  let url;
+  try { url = new URL(String(value || "")); }
+  catch { throw new Error("INVALID_PAYMENT_LINK"); }
+  const host = url.hostname.toLowerCase();
+  if (url.protocol !== "https:" || !(host === "payway.com.kh" || host.endsWith(".payway.com.kh"))) {
+    throw new Error("INVALID_PAYMENT_LINK");
+  }
+  return url.href;
+}
+
+function setPaymentEnvironment(mode = "sandbox") {
+  const normalized = String(mode || "sandbox").toLowerCase();
+  if (paymentEnvironmentBadge) {
+    paymentEnvironmentBadge.textContent = normalized === "production" ? "PayWay Secure Checkout" : "PayWay Sandbox — Test Only";
+  }
+}
+
+function stopPaymentStatusPolling() {
+  if (paymentStatusTimer) window.clearTimeout(paymentStatusTimer);
+  paymentStatusTimer = null;
+}
+
+async function pollPaymentStatus(reference, attemptsRemaining = 12) {
+  if (!reference || !localStorage.getItem("ptrApiToken")) return;
+  stopPaymentStatusPolling();
+  try {
+    const payload = await apiRequest(`/api/invoices/${encodeURIComponent(reference)}/payment-status`);
+    if (payload.invoice) {
+      const savedRequest = JSON.parse(localStorage.getItem("latestBookingRequest") || "{}");
+      renderServerInvoice(normalizeServerInvoice(payload), savedRequest);
+    }
+    const status = String(payload.paymentStatus || payload.status || payload.invoice?.status || "PAYMENT PENDING");
+    const paid = payload.paid === true || status.toUpperCase() === "PAID";
+    if (paid) {
+      localStorage.removeItem("ptrPendingInvoiceReference");
+      if (paymentProviderStatus) paymentProviderStatus.textContent = "Payment confirmed by PayWay.";
+      setRequestMessage("Payment confirmed. Your booking record has been updated securely.", true);
+      await renderCustomerDashboard();
+      return;
+    }
+    if (paymentProviderStatus) paymentProviderStatus.textContent = `PayWay status: ${status}`;
+    if (attemptsRemaining > 1) {
+      paymentStatusTimer = window.setTimeout(() => pollPaymentStatus(reference, attemptsRemaining - 1), 5000);
+    }
+  } catch {
+    if (attemptsRemaining > 1) {
+      paymentStatusTimer = window.setTimeout(() => pollPaymentStatus(reference, attemptsRemaining - 1), 5000);
+    }
+  }
+}
+
 function setInvoiceApprovalState(approved, showControls = true) {
   invoiceApproved = approved;
 
@@ -3683,11 +3841,14 @@ function setInvoiceApprovalState(approved, showControls = true) {
     invoiceApprovalStatus.hidden = !showControls;
     invoiceApprovalStatus.classList.toggle("success", approved);
     invoiceApprovalStatus.textContent = approved
-      ? "Invoice approved. The secure payment handoff is now available in preview mode."
+      ? "Invoice approved by the server. PayWay secure checkout is now available."
       : "Invoice approval is required before the secure payment step can be prepared.";
   }
 
-  if (securePaymentNotice) securePaymentNotice.hidden = !approved;
+  if (securePaymentNotice) securePaymentNotice.hidden = !showControls;
+  if (paymentProviderStatus && !approved) {
+    paymentProviderStatus.textContent = "Invoice approval is required before PayWay checkout.";
+  }
 }
 const registeredCompany = {
   name: "PRATHNA KASEKOR KHMER IMPORT EXPORT CO., LTD.",
@@ -3762,10 +3923,14 @@ function updateEstimate() {
   quantityInput.value = String(invoice.quantity);
   estimateValue.textContent = money.format(invoice.total);
 
-  if (summaryService) summaryService.textContent = invoice.selected.name;
-  if (summarySupplier) summarySupplier.textContent = money.format(invoice.supplierCost);
-  if (summaryFee) summaryFee.textContent = money.format(invoice.agencyFee);
-  if (summaryTotal) summaryTotal.textContent = money.format(invoice.total);
+  // The calculator remains a non-binding estimate. Once a server invoice is
+  // loaded, only server-returned amounts may appear in the official invoice.
+  if (!currentServerInvoice) {
+    if (summaryService) summaryService.textContent = invoice.selected.name;
+    if (summarySupplier) summarySupplier.textContent = money.format(invoice.supplierCost);
+    if (summaryFee) summaryFee.textContent = money.format(invoice.agencyFee);
+    if (summaryTotal) summaryTotal.textContent = money.format(invoice.total);
+  }
 }
 
 function setRequestService(value) {
@@ -3994,7 +4159,7 @@ function buildOfficialInvoiceHtml(savedRequest, invoice, reference) {
       <div>${escapeHtml(registeredCompany.addressKhmer)}</div>
       <div>Tel: ${escapeHtml(registeredCompany.phone)} - Email: ${escapeHtml(registeredCompany.email)}</div>
       <a href="https://${escapeHtml(registeredCompany.website)}">${escapeHtml(registeredCompany.website)}</a>
-      <p class="note">Payment is requested only after customer invoice approval. Payment details are entered only on the merchant provider's hosted checkout after integration is active.</p>
+      <p class="note">Payment is requested only after customer invoice approval. Payment details are entered only on PayWay's hosted checkout; PTR Connect does not collect card details.</p>
     </footer>
   </main>
 </body>
@@ -4003,10 +4168,12 @@ function buildOfficialInvoiceHtml(savedRequest, invoice, reference) {
 
 function openOfficialInvoicePdf() {
   const savedRequest = JSON.parse(localStorage.getItem("latestBookingRequest") || "{}");
-  const invoice = getCurrentInvoice();
-  const reference = invoiceReference?.textContent && invoiceReference.textContent !== "Pending record"
-    ? invoiceReference.textContent
-    : `INV-${Date.now().toString().slice(-6)}`;
+  if (!currentServerInvoice) {
+    setRequestMessage("Open the server-issued invoice before viewing the PDF.");
+    return;
+  }
+  const invoice = getPrintableServerInvoice(savedRequest);
+  const reference = currentServerInvoice.reference;
   const html = buildOfficialInvoiceHtml(savedRequest, invoice, reference);
 
   if (printInvoicePreview) {
@@ -4091,27 +4258,39 @@ function getSavedLogin() {
   }
 }
 
-function getBookingHistory() {
-  try { return JSON.parse(localStorage.getItem("ptrBookingHistory") || "[]"); }
-  catch { return []; }
-}
-
-function renderCustomerDashboard() {
+async function renderCustomerDashboard() {
   const login = getSavedLogin();
-  const history = getBookingHistory().filter((item) => login && item.loginEmail === login.email);
   if (dashboardUser) dashboardUser.textContent = login ? `Account: ${login.email}` : "Please login to view your records.";
   if (logoutButton) logoutButton.hidden = !login;
   if (!historyList) return;
-  if (!login || !history.length) {
-    historyList.innerHTML = `<p>${login ? "No booking records yet." : "Login to view booking and invoice history."}</p>`;
+  if (!login) {
+    historyList.innerHTML = "<p>Login to view booking and invoice history.</p>";
     return;
   }
-  historyList.innerHTML = history.slice().reverse().map((item) => `
-    <article>
-      <strong>${item.reference || "Booking pending invoice"}</strong>
-      <p>${(item.serviceNames || []).join(" + ") || item.service || "Service request"}</p>
-      <small>${new Date(item.recordedAt).toLocaleString()} · ${item.status || "RECORDED"}</small>
-    </article>`).join("");
+  historyList.innerHTML = "<p>Loading secure booking records…</p>";
+  try {
+    const payload = await apiRequest("/api/bookings");
+    const bookings = Array.isArray(payload.bookings) ? payload.bookings : [];
+    if (!bookings.length) {
+      historyList.innerHTML = "<p>No booking records yet.</p>";
+      return;
+    }
+    historyList.innerHTML = bookings.map((item) => {
+      const created = item.createdAt ? new Date(item.createdAt) : null;
+      const createdText = created && !Number.isNaN(created.getTime()) ? created.toLocaleString() : "Date pending";
+      const invoiceRef = item.invoice?.reference ? ` · Invoice ${escapeHtml(item.invoice.reference)}` : "";
+      return `
+        <article>
+          <strong>${escapeHtml(item.reference || "Booking")}</strong>
+          <p>${escapeHtml(services[item.service]?.name || item.service || "Service request")}</p>
+          <small>${escapeHtml(createdText)} · ${escapeHtml(item.status || "RECORDED")}${invoiceRef}</small>
+        </article>`;
+    }).join("");
+  } catch (error) {
+    historyList.innerHTML = error.message === "AUTH_REQUIRED"
+      ? "<p>Your login expired. Please sign in again.</p>"
+      : "<p>Booking history is temporarily unavailable. Please retry shortly.</p>";
+  }
 }
 
 function applyLoginState() {
@@ -4133,8 +4312,11 @@ function applyLoginState() {
 }
 
 if (logoutButton) logoutButton.addEventListener("click", () => {
+  stopPaymentStatusPolling();
   localStorage.removeItem("rtpConnectLogin");
   localStorage.removeItem("ptrApiToken");
+  localStorage.removeItem("ptrPendingInvoiceReference");
+  currentServerInvoice = null;
   setInvoiceApprovalState(false, false);
   applyLoginState();
 });
@@ -4207,29 +4389,38 @@ if (requestForm) {
       quantity,
       destination: formData.get("destination"),
       details: formData.get("details"),
-      invoicePreview: getCurrentInvoice(),
       recordedAt: new Date().toISOString()
     };
 
     try {
-      const response = await fetch(`${API_BASE}/api/bookings`, {method:"POST", headers:{"Content-Type":"application/json","Authorization":`Bearer ${localStorage.getItem("ptrApiToken") || ""}`}, body:JSON.stringify(savedRequest)});
-      const result = await response.json();
-      if (!response.ok) throw new Error(result.error || "Could not save booking");
-      savedRequest.reference = result.reference;
-      savedRequest.status = result.status;
-    } catch (error) {
-      requestStatus.textContent = `Booking was not saved: ${error.message}`;
-      requestStatus.classList.remove("success");
+      const result = await apiRequest("/api/bookings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: savedRequest.name,
+          contact: savedRequest.contact,
+          service: savedRequest.service,
+          extraServices: savedRequest.extraServices,
+          startDate: savedRequest.startDate,
+          duration: savedRequest.duration,
+          quantity: savedRequest.quantity,
+          destination: savedRequest.destination,
+          details: savedRequest.details
+        })
+      });
+      const booking = result.booking || result;
+      savedRequest.bookingReference = String(booking.reference || "");
+      savedRequest.status = String(booking.status || "RECORDED");
+      if (!savedRequest.bookingReference) throw new Error("INVALID_BOOKING_RESPONSE");
+    } catch {
+      setRequestMessage("Booking was not saved. Please check your login and try again.");
       return;
     }
 
     localStorage.setItem("latestBookingRequest", JSON.stringify(savedRequest));
-    const history = getBookingHistory();
-    history.push({ ...savedRequest, status: "RECORDED" });
-    localStorage.setItem("ptrBookingHistory", JSON.stringify(history));
-    renderCustomerDashboard();
-    requestStatus.textContent = "Booking details recorded. Press Invoice Review to check full invoice conditions before payment.";
-    requestStatus.classList.add("success");
+    currentServerInvoice = null;
+    await renderCustomerDashboard();
+    setRequestMessage("Booking details recorded securely. Press Invoice Review to request the server-issued invoice.", true);
     if (invoiceReviewButton) invoiceReviewButton.hidden = false;
     if (invoiceReviewPanel) invoiceReviewPanel.hidden = true;
     setInvoiceApprovalState(false, false);
@@ -4237,40 +4428,52 @@ if (requestForm) {
 }
 
 if (invoiceReviewButton) {
-  invoiceReviewButton.addEventListener("click", () => {
+  invoiceReviewButton.addEventListener("click", async () => {
     const savedRequest = JSON.parse(localStorage.getItem("latestBookingRequest") || "{}");
-    const invoice = getCurrentInvoice();
-    const reference = `INV-${Date.now().toString().slice(-6)}`;
-    const history = getBookingHistory();
-    const current = history.slice().reverse().find((item) => item.loginEmail === savedRequest.loginEmail && !item.reference);
-    if (current) { current.reference = reference; current.status = "INVOICE READY"; localStorage.setItem("ptrBookingHistory", JSON.stringify(history)); }
-
-    if (invoiceReference) invoiceReference.textContent = reference;
-    if (invoiceCustomer) invoiceCustomer.textContent = savedRequest.name || "-";
-    if (invoiceContact) invoiceContact.textContent = savedRequest.contact || "-";
-    if (summaryService) summaryService.textContent = (savedRequest.serviceNames && savedRequest.serviceNames.length)
-      ? savedRequest.serviceNames.join(" + ")
-      : invoice.selected.name;
-    if (invoiceDate) invoiceDate.textContent = new Date().toLocaleDateString("en-GB");
-    if (invoiceSchedule) invoiceSchedule.textContent = `${savedRequest.startDate || "-"} / ${savedRequest.duration || "-"}`;
-    if (invoiceDestination) invoiceDestination.textContent = savedRequest.destination || "-";
-
-    if (invoiceReviewPanel) {
-      invoiceReviewPanel.hidden = false;
-      invoiceReviewPanel.scrollIntoView({ behavior: "smooth", block: "center" });
+    if (!savedRequest.bookingReference) {
+      setRequestMessage("Record a booking before requesting an invoice.");
+      return;
     }
-    setInvoiceApprovalState(false, true);
 
-    const whatsappServices = (savedRequest.serviceNames && savedRequest.serviceNames.length)
-      ? savedRequest.serviceNames.join(" + ")
-      : invoice.selected.name;
-    const whatsappText = encodeURIComponent(`PTR Connect booking: ${savedRequest.name || "Customer"} - Services: ${whatsappServices} - Total ${money.format(invoice.total)}`);
-    if (whatsAppNotifyButton) {
-      whatsAppNotifyButton.href = `https://wa.me/${adminWhatsAppNumber}?text=${whatsappText}`;
-      whatsAppNotifyButton.hidden = false;
+    invoiceReviewButton.disabled = true;
+    invoiceReviewButton.textContent = "Preparing Server Invoice…";
+    setRequestMessage("Preparing your secure server-issued invoice…");
+    try {
+      const payload = await apiRequest(`/api/bookings/${encodeURIComponent(savedRequest.bookingReference)}/invoice`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: "{}"
+      });
+      const invoice = normalizeServerInvoice(payload);
+      renderServerInvoice(invoice, savedRequest);
+
+      if (invoiceReviewPanel) {
+        invoiceReviewPanel.hidden = false;
+        invoiceReviewPanel.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+      const alreadyApproved = /APPROVED|PAYMENT PENDING|PAID/i.test(invoice.status);
+      setInvoiceApprovalState(alreadyApproved, true);
+
+      const whatsappServices = savedRequest.serviceNames?.length
+        ? savedRequest.serviceNames.join(" + ")
+        : services[savedRequest.service]?.name || "Service request";
+      const whatsappText = encodeURIComponent(
+        `PTR Connect booking: ${savedRequest.name || "Customer"} - Invoice: ${invoice.reference} - Services: ${whatsappServices} - Total ${invoiceMoney(invoice.total, invoice.currency)}`
+      );
+      if (whatsAppNotifyButton) {
+        whatsAppNotifyButton.href = `https://wa.me/${adminWhatsAppNumber}?text=${whatsappText}`;
+        whatsAppNotifyButton.hidden = false;
+      }
+      if (pdfInvoiceButton) pdfInvoiceButton.hidden = false;
+      await renderCustomerDashboard();
+      setRequestMessage("Server invoice ready. Review the exact amount and conditions before approval.", true);
+    } catch {
+      currentServerInvoice = null;
+      setRequestMessage("The invoice could not be prepared securely. Please retry shortly.");
+    } finally {
+      invoiceReviewButton.disabled = false;
+      invoiceReviewButton.textContent = "Invoice Review";
     }
-    if (pdfInvoiceButton) pdfInvoiceButton.hidden = false;
-    renderCustomerDashboard();
   });
 }
 
@@ -4279,51 +4482,63 @@ if (pdfInvoiceButton) {
 }
 
 if (approveInvoiceButton) {
-  approveInvoiceButton.addEventListener("click", () => {
+  approveInvoiceButton.addEventListener("click", async () => {
     const savedRequest = JSON.parse(localStorage.getItem("latestBookingRequest") || "{}");
-    if (!savedRequest.name) {
-      requestStatus.textContent = "Record the booking details before approving the invoice.";
-      requestStatus.classList.remove("success");
+    if (!savedRequest.name || !currentServerInvoice?.reference) {
+      setRequestMessage("Open the server-issued invoice before approving it.");
       return;
     }
 
-    setInvoiceApprovalState(true, true);
-    localStorage.setItem("latestInvoiceApproval", JSON.stringify({
-      reference: invoiceReference?.textContent || "",
-      customer: savedRequest.name,
-      approvedAt: new Date().toISOString()
-    }));
-    const history = getBookingHistory();
-    const current = history.find((item) => item.reference === (invoiceReference?.textContent || ""));
-    if (current) { current.status = "APPROVED — PAYMENT PENDING"; localStorage.setItem("ptrBookingHistory", JSON.stringify(history)); }
-    renderCustomerDashboard();
-    requestStatus.textContent = "Invoice approved. Secure payment handoff is available in preview mode.";
-    requestStatus.classList.add("success");
+    approveInvoiceButton.disabled = true;
+    approveInvoiceButton.textContent = "Approving…";
+    try {
+      const payload = await apiRequest(`/api/invoices/${encodeURIComponent(currentServerInvoice.reference)}/approve`, {
+        method: "POST"
+      });
+      const approvedInvoice = normalizeServerInvoice(payload);
+      renderServerInvoice(approvedInvoice, savedRequest);
+      setInvoiceApprovalState(true, true);
+      if (paymentProviderStatus) paymentProviderStatus.textContent = "Ready to create a one-time PayWay payment link.";
+      await renderCustomerDashboard();
+      setRequestMessage("Invoice approved securely. You may now continue to PayWay checkout.", true);
+    } catch {
+      setInvoiceApprovalState(false, true);
+      setRequestMessage("Invoice approval was not completed. Please retry; no payment was started.");
+    }
   });
 }
 
 if (securePaymentButton) {
-  securePaymentButton.addEventListener("click", () => {
-    if (!invoiceApproved) return;
-
-    const invoice = getCurrentInvoice();
-    localStorage.setItem("latestPaymentHandoff", JSON.stringify({
-      reference: invoiceReference?.textContent || "",
-      total: invoice.total,
-      service: invoice.selected.name,
-      preparedAt: new Date().toISOString(),
-      mode: paymentGatewayConfig.mode,
-      note: "No payment credentials are collected or processed by this static website."
-    }));
-
-    if (paymentGatewayConfig.mode === "live" && paymentGatewayConfig.hostedCheckoutUrl) {
-      window.location.assign(paymentGatewayConfig.hostedCheckoutUrl);
+  securePaymentButton.addEventListener("click", async () => {
+    if (!invoiceApproved || !currentServerInvoice?.reference) {
+      setRequestMessage("Approve the server-issued invoice before starting payment.");
       return;
     }
 
+    securePaymentButton.disabled = true;
+    securePaymentButton.textContent = "Creating Secure PayWay Link…";
     if (securePaymentNotice) securePaymentNotice.hidden = false;
-    requestStatus.textContent = "Secure payment integration pending merchant approval.";
-    requestStatus.classList.add("success");
+    if (paymentProviderStatus) paymentProviderStatus.textContent = "Creating a one-time hosted PayWay payment link…";
+    setRequestMessage("Connecting securely to PayWay. Do not close this page…");
+
+    try {
+      const payload = await apiRequest(`/api/invoices/${encodeURIComponent(currentServerInvoice.reference)}/payment-link`, {
+        method: "POST"
+      });
+      const paymentLink = validatePayWayPaymentLink(
+        payload.paymentUrl || payload.paymentLink || payload.payment_link || payload.data?.payment_link
+      );
+      setPaymentEnvironment(payload.mode || "sandbox");
+      localStorage.setItem("ptrPendingInvoiceReference", currentServerInvoice.reference);
+      if (paymentProviderStatus) paymentProviderStatus.textContent = "Redirecting to PayWay hosted checkout…";
+      setRequestMessage("Secure PayWay link created. Redirecting now…", true);
+      window.location.assign(paymentLink);
+    } catch {
+      securePaymentButton.disabled = false;
+      securePaymentButton.textContent = "Confirm & Proceed to Secure Payment";
+      if (paymentProviderStatus) paymentProviderStatus.textContent = "PayWay checkout was not started.";
+      setRequestMessage("The secure payment link could not be created. No payment was charged; please retry.");
+    }
   });
 }
 
@@ -4349,6 +4564,13 @@ if (feedbackForm) {
 }
 
 applyLoginState();
+setPaymentEnvironment("sandbox");
+const pendingInvoiceReference = localStorage.getItem("ptrPendingInvoiceReference");
+if (pendingInvoiceReference && localStorage.getItem("ptrApiToken")) {
+  if (securePaymentNotice) securePaymentNotice.hidden = false;
+  if (paymentProviderStatus) paymentProviderStatus.textContent = "Checking the latest PayWay payment status…";
+  pollPaymentStatus(pendingInvoiceReference);
+}
 
 </script>
   </body>
