@@ -1,11 +1,15 @@
 import base64
+from collections import deque
 import hashlib
 import hmac
 import json
 import logging
+import math
 import os
 import re
 import secrets
+import threading
+import time
 from datetime import datetime, timedelta, timezone
 from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
 
@@ -68,6 +72,17 @@ PAYWAY_CREATE_TIMEOUT = (3.05, 8)
 PAYWAY_CHECK_TIMEOUT = (1.0, 1.5)
 PAYWAY_RECHECK_SECONDS = 10
 PAYWAY_CREATE_STALE_SECONDS = 120
+# This is intentionally a high, coarse ceiling because legitimate PayWay
+# callbacks can share provider egress IPs. The per-reference limit below is
+# the tighter guard that prevents repeated provider reconciliation calls.
+CALLBACK_IP_RATE_LIMIT = 600
+CALLBACK_REFERENCE_RATE_LIMIT = 6
+BOOKING_READ_RATE_LIMIT = 60
+BOOKING_MUTATION_RATE_LIMIT = 12
+INVOICE_MUTATION_RATE_LIMIT = 12
+PAYMENT_LINK_RATE_LIMIT = 6
+PAYMENT_STATUS_RATE_LIMIT = 30
+RATE_LIMIT_WINDOW_SECONDS = 60
 INVOICE_READY = "INVOICE READY"
 INVOICE_APPROVED = "APPROVED - PAYMENT PENDING"
 PAYMENT_LINK_READY = "PAYMENT LINK READY"
@@ -92,6 +107,79 @@ logger = logging.getLogger(__name__)
 CORS(app, resources={r"/api/*": {"origins": [
     "https://www.ptrconnect.online", "https://ptrconnect.online"
 ]}})
+
+
+_RATE_LIMIT_BUCKETS = {}
+_RATE_LIMIT_LOCK = threading.Lock()
+_RATE_LIMIT_MAX_BUCKETS = 4096
+
+
+def _rate_limit_bucket_key(scope, identity):
+    """Hash identifiers so raw user, IP and payment references are not retained."""
+    digest = hashlib.sha256(str(identity).encode("utf-8")).hexdigest()
+    return scope, digest
+
+
+def _prune_rate_limit_buckets(now_value):
+    cutoff = now_value - RATE_LIMIT_WINDOW_SECONDS
+    stale = [
+        key
+        for key, bucket in _RATE_LIMIT_BUCKETS.items()
+        if not bucket or bucket[-1] <= cutoff
+    ]
+    for key in stale:
+        _RATE_LIMIT_BUCKETS.pop(key, None)
+
+
+def _rate_limit_response(scope, identity, limit):
+    now_value = time.monotonic()
+    key = _rate_limit_bucket_key(scope, identity)
+    with _RATE_LIMIT_LOCK:
+        bucket = _RATE_LIMIT_BUCKETS.get(key)
+        if bucket is None:
+            if len(_RATE_LIMIT_BUCKETS) >= _RATE_LIMIT_MAX_BUCKETS:
+                _prune_rate_limit_buckets(now_value)
+            if len(_RATE_LIMIT_BUCKETS) >= _RATE_LIMIT_MAX_BUCKETS:
+                return (
+                    jsonify(error="Too many requests. Please try again shortly."),
+                    429,
+                    {"Retry-After": str(RATE_LIMIT_WINDOW_SECONDS)},
+                )
+            bucket = deque()
+            _RATE_LIMIT_BUCKETS[key] = bucket
+        cutoff = now_value - RATE_LIMIT_WINDOW_SECONDS
+        while bucket and bucket[0] <= cutoff:
+            bucket.popleft()
+        if len(bucket) >= limit:
+            retry_after = max(
+                1,
+                math.ceil(RATE_LIMIT_WINDOW_SECONDS - (now_value - bucket[0])),
+            )
+            return (
+                jsonify(error="Too many requests. Please try again shortly."),
+                429,
+                {"Retry-After": str(retry_after)},
+            )
+        bucket.append(now_value)
+    return None
+
+
+def _client_ip_rate_limit(scope, limit):
+    return _rate_limit_response(
+        f"{scope}:ip",
+        f"ip:{request.remote_addr or 'unknown'}",
+        limit * 5,
+    )
+
+
+def _user_rate_limit(scope, user, limit):
+    return _rate_limit_response(f"{scope}:user", f"user:{user.id}", limit)
+
+
+def _clear_rate_limits_for_testing():
+    with _RATE_LIMIT_LOCK:
+        _RATE_LIMIT_BUCKETS.clear()
+
 
 def now(): return datetime.now(timezone.utc)
 
@@ -660,9 +748,17 @@ def login():
 
 @app.route("/api/bookings", methods=["GET", "POST"])
 def bookings():
+    scope = "bookings-read" if request.method == "GET" else "bookings-write"
+    limit = BOOKING_READ_RATE_LIMIT if request.method == "GET" else BOOKING_MUTATION_RATE_LIMIT
+    limited = _client_ip_rate_limit(scope, limit)
+    if limited:
+        return limited
     user, error = require_user()
     if error:
         return error
+    limited = _user_rate_limit(scope, user, limit)
+    if limited:
+        return limited
     if request.method == "GET":
         rows = Booking.query.filter_by(user_id=user.id).order_by(Booking.id.desc()).all()
         results = []
@@ -799,9 +895,15 @@ def bookings():
 
 @app.post("/api/bookings/<reference>/invoice")
 def create_invoice(reference):
+    limited = _client_ip_rate_limit("invoice-create", INVOICE_MUTATION_RATE_LIMIT)
+    if limited:
+        return limited
     user, error = require_user()
     if error:
         return error
+    limited = _user_rate_limit("invoice-create", user, INVOICE_MUTATION_RATE_LIMIT)
+    if limited:
+        return limited
     booking = Booking.query.filter_by(reference=reference, user_id=user.id).first_or_404()
     existing = Invoice.query.filter_by(booking_id=booking.id).first()
     if existing:
@@ -839,9 +941,15 @@ def create_invoice(reference):
 
 @app.post("/api/invoices/<reference>/approve")
 def approve_invoice(reference):
+    limited = _client_ip_rate_limit("invoice-approve", INVOICE_MUTATION_RATE_LIMIT)
+    if limited:
+        return limited
     user, error = require_user()
     if error:
         return error
+    limited = _user_rate_limit("invoice-approve", user, INVOICE_MUTATION_RATE_LIMIT)
+    if limited:
+        return limited
     invoice = invoice_for_user(reference, user)
     if invoice.status == PAYMENT_PAID:
         return jsonify(invoice_json(invoice)), 200
@@ -854,9 +962,15 @@ def approve_invoice(reference):
 
 @app.post("/api/invoices/<reference>/payment-link")
 def create_invoice_payment_link(reference):
+    limited = _client_ip_rate_limit("payment-link", PAYMENT_LINK_RATE_LIMIT)
+    if limited:
+        return limited
     user, error = require_user()
     if error:
         return error
+    limited = _user_rate_limit("payment-link", user, PAYMENT_LINK_RATE_LIMIT)
+    if limited:
+        return limited
     invoice = invoice_for_user(reference, user)
     booking = db.session.get(Booking, invoice.booking_id)
     attempt = PaymentAttempt.query.filter_by(invoice_id=invoice.id).first()
@@ -950,9 +1064,15 @@ def create_invoice_payment_link(reference):
 
 @app.get("/api/invoices/<reference>/payment-status")
 def invoice_payment_status(reference):
+    limited = _client_ip_rate_limit("payment-status", PAYMENT_STATUS_RATE_LIMIT)
+    if limited:
+        return limited
     user, error = require_user()
     if error:
         return error
+    limited = _user_rate_limit("payment-status", user, PAYMENT_STATUS_RATE_LIMIT)
+    if limited:
+        return limited
     invoice = invoice_for_user(reference, user)
     attempt = PaymentAttempt.query.filter_by(invoice_id=invoice.id).first()
     verification_deferred = False
@@ -980,6 +1100,14 @@ def invoice_payment_status(reference):
 
 @app.post("/api/payments/payway/callback")
 def payway_payment_callback():
+    limited = _rate_limit_response(
+        "payway-callback:ip",
+        f"ip:{request.remote_addr or 'unknown'}",
+        CALLBACK_IP_RATE_LIMIT,
+    )
+    if limited:
+        return limited
+
     payload = request.get_json(silent=True)
     if not isinstance(payload, dict):
         return jsonify(error="Invalid callback payload"), 400
@@ -988,6 +1116,14 @@ def payway_payment_callback():
     tran_id = str(payload.get("tran_id") or "").strip()
     if not merchant_ref_no or len(merchant_ref_no) > 50 or not PAYWAY_TRANSACTION_ID_RE.fullmatch(tran_id):
         return jsonify(error="Invalid callback payload"), 400
+
+    limited = _rate_limit_response(
+        "payway-callback:reference",
+        f"reference:{merchant_ref_no}",
+        CALLBACK_REFERENCE_RATE_LIMIT,
+    )
+    if limited:
+        return limited
 
     received_signature = request.headers.get("X-PayWay-HMAC-SHA512", "").strip()
     signature_valid = False
