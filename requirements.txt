@@ -7,3 +7,4 @@ psycopg2-binary==2.9.10
 Authlib==1.6.1
 requests==2.32.4
 google-auth==2.40.3
+cryptography==45.0.5
