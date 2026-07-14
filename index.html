@@ -3988,10 +3988,10 @@ function buildOfficialInvoiceHtml(savedRequest, invoice, reference) {
         <td>${index + 1}</td>
         <td>${escapeHtml(itemCode)}</td>
         <td>${escapeHtml(name)}</td>
-        <td class="amount">$${price.toLocaleString("en-US")}.00</td>
+        <td class="amount">${invoiceMoney(price, invoice.currency)}</td>
         <td>${unit}</td>
         <td>${escapeHtml(savedRequest.duration || "-")}</td>
-        <td class="amount">$${extended.toLocaleString("en-US")}.00</td>
+        <td class="amount">${invoiceMoney(extended, invoice.currency)}</td>
       </tr>`;
   }).join("");
 
@@ -4132,25 +4132,25 @@ function buildOfficialInvoiceHtml(savedRequest, invoice, reference) {
           <td>F</td>
           <td>FEE</td>
           <td>PTR Connect coordination service fee</td>
-          <td class="amount">$${invoice.agencyFee.toLocaleString("en-US")}.00</td>
+          <td class="amount">${invoiceMoney(invoice.agencyFee, invoice.currency)}</td>
           <td>1</td>
           <td>-</td>
-          <td class="amount">$${invoice.agencyFee.toLocaleString("en-US")}.00</td>
+          <td class="amount">${invoiceMoney(invoice.agencyFee, invoice.currency)}</td>
         </tr>
       </tbody>
     </table>
     <section class="summary">
       <div class="comment">COMMENT: <b>Thank You !</b></div>
       <div class="totals">
-        <div class="totals-row">SALE AMOUNT&nbsp;&nbsp; ${money.format(invoice.supplierCost)}</div>
-        <div class="totals-row">TOTAL AMOUNT&nbsp;&nbsp; ${money.format(invoice.total)}</div>
+        <div class="totals-row">SALE AMOUNT&nbsp;&nbsp; ${invoiceMoney(invoice.supplierCost, invoice.currency)}</div>
+        <div class="totals-row">TOTAL AMOUNT&nbsp;&nbsp; ${invoiceMoney(invoice.total, invoice.currency)}</div>
         <div class="totals-row">Deposit</div>
       </div>
     </section>
     <section class="balance">
       <div class="signature">GUEST'S SIGNATURE</div>
       <div class="balance-label">BALANCE DUE (USD)</div>
-      <div class="balance-amount">${money.format(invoice.total)}</div>
+      <div class="balance-amount">${invoiceMoney(invoice.total, invoice.currency)}</div>
     </section>
     <footer class="footer">
       <div>${escapeHtml(registeredCompany.name)}</div>
