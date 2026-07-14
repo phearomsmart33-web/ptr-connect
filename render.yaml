@@ -15,6 +15,22 @@ services:
         fromDatabase:
           name: ptr-connect-db
           property: connectionString
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      # Keep Sandbox until ABA approves UAT and issues matched production credentials.
+      - key: PAYWAY_MODE
+        value: sandbox
+      - key: PAYWAY_MERCHANT_ID
+        sync: false
+      - key: PAYWAY_API_KEY
+        sync: false
+      # ABA RSA PUBLIC key only. Never configure or commit a private key.
+      - key: PAYWAY_RSA_PUBLIC_KEY
+        sync: false
+      - key: PAYWAY_LINK_LIFETIME_SECONDS
+        value: "3600"
 databases:
   - name: ptr-connect-db
     plan: free
