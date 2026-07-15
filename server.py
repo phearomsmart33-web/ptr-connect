@@ -439,6 +439,15 @@ def create_payway_payment_link(invoice, booking, merchant_ref_no):
         response.raise_for_status()
         result = response.json()
     except (requests.RequestException, ValueError) as exc:
+        # Record only operational metadata. Never log credentials, encrypted
+        # merchant_auth, response bodies, invoice references, or customer data.
+        upstream_status = getattr(getattr(exc, "response", None), "status_code", None)
+        app.logger.warning(
+            "PayWay create-link request failed type=%s upstream_status=%s mode=%s",
+            type(exc).__name__,
+            upstream_status if upstream_status is not None else "none",
+            config["mode"],
+        )
         raise PayWayError("PayWay could not create the payment link", "PAYWAY_UNAVAILABLE") from exc
     if not isinstance(result, dict):
         raise PayWayError("PayWay returned an invalid response", "PAYWAY_RESPONSE_INVALID")
@@ -1047,6 +1056,13 @@ def create_invoice_payment_link(reference):
         attempt.status = "CONFIG_ERROR" if exc.code in local_config_errors else "RECONCILIATION_REQUIRED"
         attempt.error_code = exc.code[:40]
         db.session.commit()
+        # Safe diagnostic only: the code and mode contain no merchant secret,
+        # payment credential, customer data, or provider response body.
+        app.logger.warning(
+            "PayWay payment-link creation failed code=%s mode=%s",
+            exc.code,
+            payway_mode(),
+        )
         http_status = 503 if exc.code in local_config_errors or exc.code == "PAYWAY_UNAVAILABLE" else 502
         return jsonify(error="PayWay could not create a payment link", code=exc.code), http_status
 
