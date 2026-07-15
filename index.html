@@ -3171,6 +3171,21 @@ h4 {
   margin: 0 0 8px;
 }
 
+.secure-payment-heading {
+  margin: 0 0 6px;
+  color: var(--navy);
+  font-size: 1rem;
+  font-weight: 800;
+}
+
+.secure-payment-safety {
+  margin: 10px 0 0;
+  padding-top: 10px;
+  border-top: 1px solid rgba(10, 102, 255, 0.16);
+  color: #43557d;
+  font-size: .78rem;
+}
+
 .payment-environment-badge {
   display: inline-flex;
   align-items: center;
@@ -3750,11 +3765,13 @@ h4 {
             </div>
             <a class="button secondary full" id="whatsAppNotifyButton" href="#" target="_blank" rel="noopener" hidden>Notify Admin via WhatsApp</a>
             <button class="button secondary full" id="pdfInvoiceButton" type="button" hidden>View / Download PDF Invoice</button>
-            <button class="button primary full" id="securePaymentButton" type="button" hidden disabled>Confirm &amp; Proceed to Secure Payment</button>
+            <button class="button primary full" id="securePaymentButton" type="button" hidden disabled>Continue to ABA PayWay</button>
             <div class="secure-payment-notice" id="securePaymentNotice" role="status" aria-live="polite" hidden>
-              <span class="payment-environment-badge" id="paymentEnvironmentBadge">PayWay Sandbox</span>
-              <p>You will be redirected to our approved secure payment provider to select an available payment method.</p>
-              <strong id="paymentProviderStatus">Invoice approval is required before PayWay checkout.</strong>
+              <span class="payment-environment-badge" id="paymentEnvironmentBadge">ABA PayWay Sandbox — Test Only</span>
+              <p class="secure-payment-heading">Secure hosted checkout</p>
+              <p>You will leave PTR Connect and continue on the official ABA PayWay checkout page. Available payment methods are displayed and processed by ABA PayWay.</p>
+              <strong id="paymentProviderStatus">Invoice approval is required before ABA PayWay checkout.</strong>
+              <p class="secure-payment-safety">PTR Connect does not request or store your card number, CVV, PIN, or OTP on this website.</p>
             </div>
             <div class="print-invoice-preview" id="printInvoicePreview" hidden></div>
           </article>
@@ -4058,7 +4075,7 @@ function validatePayWayPaymentLink(value) {
 function setPaymentEnvironment(mode = "sandbox") {
   const normalized = String(mode || "sandbox").toLowerCase();
   if (paymentEnvironmentBadge) {
-    paymentEnvironmentBadge.textContent = normalized === "production" ? "PayWay Secure Checkout" : "PayWay Sandbox — Test Only";
+    paymentEnvironmentBadge.textContent = normalized === "production" ? "ABA PayWay — Secure Checkout" : "ABA PayWay Sandbox — Test Only";
   }
 }
 
@@ -4080,12 +4097,12 @@ async function pollPaymentStatus(reference, attemptsRemaining = 12) {
     const paid = payload.paid === true || status.toUpperCase() === "PAID";
     if (paid) {
       localStorage.removeItem("ptrPendingInvoiceReference");
-      if (paymentProviderStatus) paymentProviderStatus.textContent = "Payment confirmed by PayWay.";
+      if (paymentProviderStatus) paymentProviderStatus.textContent = "Payment confirmed by ABA PayWay.";
       setRequestMessage("Payment confirmed. Your booking record has been updated securely.", true);
       await renderCustomerDashboard();
       return;
     }
-    if (paymentProviderStatus) paymentProviderStatus.textContent = `PayWay status: ${status}`;
+    if (paymentProviderStatus) paymentProviderStatus.textContent = `ABA PayWay status: ${status}`;
     if (attemptsRemaining > 1) {
       paymentStatusTimer = window.setTimeout(() => pollPaymentStatus(reference, attemptsRemaining - 1), 5000);
     }
@@ -4118,13 +4135,13 @@ function setInvoiceApprovalState(approved, showControls = true) {
     invoiceApprovalStatus.hidden = !showControls;
     invoiceApprovalStatus.classList.toggle("success", approved);
     invoiceApprovalStatus.textContent = approved
-      ? "Invoice approved by the server. PayWay secure checkout is now available."
+      ? "Invoice approved by the server. ABA PayWay secure checkout is now available."
       : "Invoice approval is required before the secure payment step can be prepared.";
   }
 
   if (securePaymentNotice) securePaymentNotice.hidden = !showControls;
   if (paymentProviderStatus && !approved) {
-    paymentProviderStatus.textContent = "Invoice approval is required before PayWay checkout.";
+    paymentProviderStatus.textContent = "Invoice approval is required before ABA PayWay checkout.";
   }
 }
 const registeredCompany = {
@@ -4775,9 +4792,9 @@ if (approveInvoiceButton) {
       const approvedInvoice = normalizeServerInvoice(payload);
       renderServerInvoice(approvedInvoice, savedRequest);
       setInvoiceApprovalState(true, true);
-      if (paymentProviderStatus) paymentProviderStatus.textContent = "Ready to create a one-time PayWay payment link.";
+      if (paymentProviderStatus) paymentProviderStatus.textContent = "Ready to create a one-time ABA PayWay payment link.";
       await renderCustomerDashboard();
-      setRequestMessage("Invoice approved securely. You may now continue to PayWay checkout.", true);
+      setRequestMessage("Invoice approved securely. You may now continue to ABA PayWay checkout.", true);
     } catch {
       setInvoiceApprovalState(false, true);
       setRequestMessage("Invoice approval was not completed. Please retry; no payment was started.");
@@ -4793,9 +4810,9 @@ if (securePaymentButton) {
     }
 
     securePaymentButton.disabled = true;
-    securePaymentButton.textContent = "Creating Secure PayWay Link…";
+    securePaymentButton.textContent = "Preparing ABA PayWay…";
     if (securePaymentNotice) securePaymentNotice.hidden = false;
-    if (paymentProviderStatus) paymentProviderStatus.textContent = "Creating a one-time hosted PayWay payment link…";
+    if (paymentProviderStatus) paymentProviderStatus.textContent = "Creating a one-time hosted ABA PayWay payment link…";
     setRequestMessage("Connecting securely to PayWay. Do not close this page…");
 
     try {
@@ -4807,13 +4824,13 @@ if (securePaymentButton) {
       );
       setPaymentEnvironment(payload.mode || "sandbox");
       localStorage.setItem("ptrPendingInvoiceReference", currentServerInvoice.reference);
-      if (paymentProviderStatus) paymentProviderStatus.textContent = "Redirecting to PayWay hosted checkout…";
+      if (paymentProviderStatus) paymentProviderStatus.textContent = "Redirecting to ABA PayWay hosted checkout…";
       setRequestMessage("Secure PayWay link created. Redirecting now…", true);
       window.location.assign(paymentLink);
     } catch {
       securePaymentButton.disabled = false;
-      securePaymentButton.textContent = "Confirm & Proceed to Secure Payment";
-      if (paymentProviderStatus) paymentProviderStatus.textContent = "PayWay checkout was not started.";
+      securePaymentButton.textContent = "Continue to ABA PayWay";
+      if (paymentProviderStatus) paymentProviderStatus.textContent = "ABA PayWay checkout was not started.";
       setRequestMessage("The secure payment link could not be created. No payment was charged; please retry.");
     }
   });
@@ -4845,7 +4862,7 @@ setPaymentEnvironment("sandbox");
 const pendingInvoiceReference = localStorage.getItem("ptrPendingInvoiceReference");
 if (pendingInvoiceReference && localStorage.getItem("ptrApiToken")) {
   if (securePaymentNotice) securePaymentNotice.hidden = false;
-  if (paymentProviderStatus) paymentProviderStatus.textContent = "Checking the latest PayWay payment status…";
+  if (paymentProviderStatus) paymentProviderStatus.textContent = "Checking the latest ABA PayWay payment status…";
   pollPaymentStatus(pendingInvoiceReference);
 }
 
