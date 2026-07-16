@@ -3441,6 +3441,16 @@ h4 {
   object-fit: contain;
   object-position: center;
 }
+.brand-text-fallback {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  color: #071d49;
+  font-size: 18px;
+  letter-spacing: .04em;
+}
+.brand-text-fallback[hidden] { display: none; }
 .footer-logo {
   display: block;
   width: min(290px, 100%);
@@ -3497,28 +3507,129 @@ h4 {
 @media (max-width: 980px) {
   .site-header > .header-login { display: none; }
 }
+
+/* PTR customer journey: one clear header, one hero, one booking path. */
+.site-header {
+  min-height: 76px;
+  padding: 0 max(24px, calc((100vw - 1380px) / 2));
+  background: #061f49;
+  border-bottom: 1px solid rgba(255, 255, 255, .1);
+  box-shadow: 0 8px 24px rgba(5, 25, 58, .16);
+}
+.site-header .brand {
+  width: 188px;
+  min-width: 188px;
+  height: 68px;
+  padding: 5px 10px;
+  border-radius: 8px;
+  background: #fff;
+}
+.site-header .nav-links { gap: clamp(14px, 1.5vw, 27px); }
+.site-header .nav-links a { color: #fff; font-size: 13px; font-weight: 800; text-transform: uppercase; }
+.site-header .nav-links a:hover,
+.site-header .nav-links a:focus-visible { color: #8eb6ff; }
+.site-header .header-login {
+  border-color: rgba(255,255,255,.3);
+  background: rgba(255,255,255,.08);
+  color: #fff;
+  box-shadow: none;
+}
+.site-header .header-login > span { background: rgba(255,255,255,.14); }
+.site-header .mobile-menu-toggle {
+  color: #fff;
+  background: transparent;
+  border-color: rgba(255,255,255,.38);
+}
+.hero {
+  position: relative;
+  min-height: 660px;
+  margin-bottom: 74px;
+  isolation: isolate;
+  background: linear-gradient(135deg, #061f49, #123b75);
+}
+.hero > img {
+  display: block;
+  z-index: -3;
+  opacity: 1;
+}
+.hero-shade {
+  display: block;
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  background: linear-gradient(90deg, rgba(3,18,48,.93) 0%, rgba(3,18,48,.72) 48%, rgba(3,18,48,.28) 100%);
+}
+.hero-content {
+  display: block;
+  position: relative;
+  z-index: 1;
+}
+.hero-content .eyebrow { color: #a9c6ff; }
+.hero-content h1,
+.hero-content .hero-copy { color: #fff; text-shadow: 0 3px 22px rgba(0,0,0,.28); }
+.hero-booking-search { border: 1px solid #e0e7f3; }
+.hero-booking-search label { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .05em; }
+.hero-booking-search input { min-height: 46px; border: 1px solid #dbe3f0; border-radius: 9px; }
+.activities-block .dashboard-title h3 { font-size: clamp(28px, 4vw, 42px); }
+.activity-row article { transition: transform .2s ease, box-shadow .2s ease; }
+.activity-row article:hover { transform: translateY(-5px); box-shadow: 0 18px 42px rgba(7,29,73,.14); }
+.package-book-button { min-height: 44px; border-radius: 9px; font-weight: 800; }
+.account-quick-actions {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  width: min(1180px, calc(100% - 48px));
+  margin: 0 auto 22px;
+}
+.account-quick-actions a {
+  display: grid;
+  grid-template-columns: 44px 1fr;
+  gap: 3px 13px;
+  align-items: center;
+  padding: 20px;
+  border: 1px solid #dce5f2;
+  border-radius: 14px;
+  background: #fff;
+  color: #071d49;
+  text-decoration: none;
+  box-shadow: 0 10px 28px rgba(7,29,73,.07);
+}
+.account-quick-actions span { grid-row: 1 / 3; display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; background: #edf3ff; color: #155eef; font-weight: 900; }
+.account-quick-actions strong { font-size: 16px; }
+.account-quick-actions small { color: #63708a; }
+@media (max-width: 1180px) {
+  .site-header .brand { width: 158px; min-width: 158px; height: 60px; }
+  .site-header .nav-links { gap: 12px; }
+  .site-header .nav-links a { font-size: 11px; }
+}
+@media (max-width: 980px) {
+  .site-header { min-height: 68px; padding-inline: 18px; }
+  .hero { min-height: 720px; }
+}
+@media (max-width: 700px) {
+  .account-quick-actions { grid-template-columns: 1fr; width: min(100% - 28px, 1180px); }
+  .hero { margin-bottom: 28px; }
+}
 </style>
   </head>
   <body>
     <header class="site-header" aria-label="Main navigation">
       <a class="brand" href="#top" aria-label="PTR Connect home">
-        <img class="brand-logo-image" src="assets/ptr-connect-travel-tours-logo.png" alt="PTR Connect Travel and Tours online" />
+        <img class="brand-logo-image" src="assets/ptr-connect-travel-tours-logo.png" alt="PTR Connect Travel and Tours online" onerror="this.hidden=true;this.nextElementSibling.hidden=false" />
+        <strong class="brand-text-fallback" hidden>PTR CONNECT</strong>
       </a>
       <nav class="nav-links" aria-label="Primary">
         <a href="#top">Home</a>
         <a href="#services">Services</a>
-         <a href="#destinations">Destinations</a>
          <a href="#packages">Packages</a>
          <a href="#request" data-book-service="tour">Tours</a>
          <a href="#request" data-book-service="transport">Book a Ride</a>
          <a href="#company">About Us</a>
         <a href="#contact">Contact</a>
        </nav>
-       <span class="language-select" aria-label="Language: English">EN</span>
        <a class="header-login" href="login.html" data-account-link aria-label="Log in to PTR Connect">
          <span aria-hidden="true"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="3.5"></circle><path d="M5.5 20c.4-4 2.8-6 6.5-6s6.1 2 6.5 6"></path></svg></span> <b>Log In</b>
        </a>
-        <a class="button primary header-request" href="#request">Book Now</a>
       <button
         class="mobile-menu-toggle"
         type="button"
@@ -3534,14 +3645,12 @@ h4 {
       <nav class="mobile-nav" id="mobileNavigation" aria-label="Mobile navigation" aria-hidden="true" hidden>
         <a href="#top">Home</a>
         <a href="#services">Services</a>
-         <a href="#destinations">Destinations</a>
          <a href="#packages">Packages</a>
          <a href="#request" data-book-service="tour">Tours</a>
          <a href="#request" data-book-service="transport">Book a Ride</a>
          <a href="#company">About Us</a>
          <a href="#contact">Contact</a>
          <a href="login.html" data-account-link>Log In</a>
-          <a class="mobile-primary" href="#request">Book Now</a>
       </nav>
     </header>
 
@@ -3578,20 +3687,6 @@ h4 {
       </section>
 
       <section class="booking-dashboard" aria-label="Booking dashboard">
-        <div class="dashboard-hero">
-          <p class="eyebrow">Your Trusted Gateway</p>
-          <h2>Discover. Book. <em>Travel.</em></h2>
-          <p>Plan Cambodia hotels, guided tours and private transport through one clear booking and invoice process.</p>
-          <div class="hero-actions">
-            <a class="button primary" href="#services">Explore Services</a>
-            <a class="button secondary" href="#process">How It Works</a>
-          </div>
-          <div class="hero-wordmark" aria-hidden="true">
-            <strong>PTR</strong>
-            <span>PTRCONNECT<em>.online</em></span>
-          </div>
-        </div>
-
         <section class="home-service-grid" id="services" aria-label="PTR Connect service categories">
           <article class="home-service-card" id="travel">
             <span class="service-icon">T</span>
@@ -3683,8 +3778,8 @@ h4 {
         <div class="dashboard-block activities-block" id="packages">
           <div class="dashboard-title">
             <div>
-              <h3>Popular Things To Do</h3>
-              <p>Tourist packages arranged through selected local suppliers.</p>
+              <h3>Travel Packages &amp; Services</h3>
+              <p>Compare clear service details, starting prices and supplier conditions before requesting a booking.</p>
             </div>
             <a href="#estimate">View service fees</a>
           </div>
@@ -3959,8 +4054,13 @@ h4 {
       <section class="section" id="customerDashboard" aria-label="Customer dashboard">
         <div class="section-heading">
           <p class="eyebrow">Customer Dashboard</p>
-          <h2>Your booking and invoice history.</h2>
-          <p>Your authenticated booking records are loaded from the secure server database.</p>
+          <h2>My Account.</h2>
+          <p>Manage requests, invoices and payment status from one secure customer area.</p>
+        </div>
+        <div class="account-quick-actions" aria-label="Customer account shortcuts">
+          <a href="#request"><span>01</span><strong>New Booking</strong><small>Request a tour, hotel or ride</small></a>
+          <a href="#historyList"><span>02</span><strong>Booking History</strong><small>Review saved service requests</small></a>
+          <a href="#historyList"><span>03</span><strong>Invoices &amp; Payment</strong><small>Track approval and payment status</small></a>
         </div>
         <div class="login-panel">
           <div class="summary-top"><strong id="dashboardUser">Please login to view your records.</strong><button class="button secondary" id="logoutButton" type="button" hidden>Logout</button></div>
@@ -4004,7 +4104,6 @@ h4 {
           <h3>Quick Links</h3>
           <a href="#top">Home</a>
           <a href="#services">Services</a>
-          <a href="#destinations">Destinations</a>
           <a href="#packages">Packages</a>
           <a href="#request">Tours</a>
           <a href="#request">Book a Ride</a>
