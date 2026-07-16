@@ -3515,8 +3515,8 @@ h4 {
         <a href="#contact">Contact</a>
        </nav>
        <span class="language-select" aria-label="Language: English">EN</span>
-       <a class="header-login" href="#request" data-account-link aria-label="Log in to PTR Connect">
-         <span aria-hidden="true">♙</span> <b>Log In</b>
+       <a class="header-login" href="login.html" data-account-link aria-label="Log in to PTR Connect">
+         <span aria-hidden="true"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="3.5"></circle><path d="M5.5 20c.4-4 2.8-6 6.5-6s6.1 2 6.5 6"></path></svg></span> <b>Log In</b>
        </a>
         <a class="button primary header-request" href="#request">Book Now</a>
       <button
@@ -3540,7 +3540,7 @@ h4 {
          <a href="#request" data-book-service="transport">Book a Ride</a>
          <a href="#company">About Us</a>
          <a href="#contact">Contact</a>
-         <a href="#request" data-account-link>Log In</a>
+         <a href="login.html" data-account-link>Log In</a>
           <a class="mobile-primary" href="#request">Book Now</a>
       </nav>
     </header>
@@ -4829,7 +4829,7 @@ function applyLoginState() {
   setBookingFormLocked(!loggedIn);
 
   accountLinks.forEach((link) => {
-    link.href = loggedIn ? "#customerDashboard" : "#request";
+    link.href = loggedIn ? "#customerDashboard" : "login.html";
     const label = loggedIn ? "My Account" : "Log In";
     const labelNode = link.querySelector("b");
     if (labelNode) labelNode.textContent = label;
