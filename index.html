@@ -4,6 +4,8 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>PTR Connect | Cambodia Tours, Hotels & Private Transport</title>
+    <link rel="icon" type="image/png" href="assets/ptr-connect-travel-tours-logo.png" />
+    <link rel="apple-touch-icon" href="assets/ptr-connect-travel-tours-logo.png" />
     <meta
       name="description"
       content="PTR Connect provides travel, business, investment, and transportation coordination with itemized invoices and payment-provider handoff readiness."
@@ -2285,6 +2287,38 @@ input:disabled {
   padding-bottom: 20px;
 }
 
+.customer-policies {
+  max-width: var(--page-width);
+  margin: 0 auto;
+  padding: 64px 0 0;
+}
+
+.customer-policies-heading {
+  max-width: 760px;
+  margin: 0 auto 28px;
+  padding: 0 24px;
+  text-align: center;
+}
+
+.customer-policies-heading .eyebrow {
+  margin-bottom: 10px;
+  color: var(--electric);
+}
+
+.customer-policies-heading h2 {
+  margin: 0;
+  color: var(--navy);
+  font-size: clamp(28px, 4vw, 42px);
+  line-height: 1.12;
+}
+
+.customer-policies-heading > p:last-child {
+  margin: 14px auto 0;
+  color: #4b5871;
+  font-size: 16px;
+  line-height: 1.65;
+}
+
 .footer-trust {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -2330,6 +2364,20 @@ input:disabled {
   color: #344775;
   font-size: 13px;
   line-height: 1.45;
+}
+
+.footer-trust a {
+  display: inline-flex;
+  margin-top: 12px;
+  color: var(--electric);
+  font-size: 13px;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.footer-trust a:hover,
+.footer-trust a:focus-visible {
+  text-decoration: underline;
 }
 
 .site-footer {
@@ -3010,6 +3058,10 @@ h4 {
 }
 
 @media (max-width: 760px) {
+  .customer-policies {
+    padding-top: 48px;
+  }
+
   .dashboard-hero h2 {
     font-size: clamp(40px, 12vw, 56px);
     line-height: 1.08;
@@ -3610,6 +3662,34 @@ h4 {
   .account-quick-actions { grid-template-columns: 1fr; width: min(100% - 28px, 1180px); }
   .hero { margin-bottom: 28px; }
 }
+.about-ptr {
+  max-width: var(--page-width);
+  margin: 0 auto;
+  padding: 72px clamp(24px, 5vw, 72px);
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(280px, .75fr);
+  gap: 48px;
+  align-items: center;
+  background: #fff;
+}
+.about-ptr .eyebrow { color: var(--electric); margin-bottom: 12px; }
+.about-ptr h2 { margin: 0 0 20px; color: var(--navy); font-size: clamp(34px, 4vw, 54px); line-height: 1.05; }
+.about-ptr p { color: #4b5871; font-size: 17px; line-height: 1.75; margin: 0 0 16px; }
+.about-ptr-points { display: grid; gap: 14px; }
+.about-ptr-points div { padding: 18px 20px; border: 1px solid #dbe5f5; border-radius: 14px; background: #f7faff; }
+.about-ptr-points strong { display: block; color: var(--navy); margin-bottom: 4px; }
+.payment-acceptance { margin-top: 22px; }
+.payment-acceptance h4 { margin: 0 0 10px; color: #fff; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; }
+.payment-badges { display: flex; flex-wrap: wrap; gap: 7px; align-items: center; }
+.payment-badge { display: inline-flex; min-height: 24px; padding: 5px 9px; align-items: center; justify-content: center; border-radius: 5px; background: #fff; color: #082552; font-size: 10px; font-weight: 900; line-height: 1; box-shadow: 0 1px 3px rgba(0,0,0,.16); }
+.payment-badge.khqr { background: #e31e24; color: #fff; }
+.payment-badge.visa { color: #1434cb; font-style: italic; }
+.payment-badge.mastercard { background: linear-gradient(90deg,#eb001b 0 48%,#ff5f00 48% 52%,#f79e1b 52%); color: #fff; }
+.payment-badge.unionpay { background: #0876bc; color: #fff; }
+.payment-badge.jcb { background: #0b8f57; color: #fff; }
+@media (max-width: 760px) {
+  .about-ptr { grid-template-columns: 1fr; padding-block: 52px; }
+}
 </style>
   </head>
   <body>
@@ -4069,23 +4149,45 @@ h4 {
       </section>
     </main>
 
-    <section class="footer-trust" aria-label="PTR Connect compliance and support summary">
-      <article>
-        <span class="footer-trust-icon" aria-hidden="true">ID</span>
-        <div><strong>Customer Verification Procedure</strong><p>Customer identification and supporting documents may be requested where required. Records may be maintained for service processing and regulatory review where applicable.</p></div>
-      </article>
-      <article>
-        <span class="footer-trust-icon" aria-hidden="true">DP</span>
-        <div><strong>Data Protection</strong><p>Your personal information is kept confidential and used only for service processing.</p></div>
-      </article>
-      <article>
-        <span class="footer-trust-icon" aria-hidden="true">DC</span>
-        <div><strong>Documented Coordination</strong><p>Service details, supplier confirmation, and invoice records support each confirmed request.</p></div>
-      </article>
-      <article>
-        <span class="footer-trust-icon" aria-hidden="true">SC</span>
-        <div><strong>Supplier Confirmation</strong><p>Services are coordinated based on customer requirements and supplier confirmation.</p></div>
-      </article>
+    <section class="customer-policies" aria-labelledby="customerPoliciesTitle">
+      <div class="customer-policies-heading">
+        <p class="eyebrow">Customer Information</p>
+        <h2 id="customerPoliciesTitle">Policies available before booking and payment.</h2>
+        <p>Review the service terms, privacy practices, cancellation conditions and verification procedure before submitting a request.</p>
+      </div>
+      <div class="footer-trust" aria-label="PTR Connect customer policies">
+        <article>
+          <span class="footer-trust-icon" aria-hidden="true">TC</span>
+          <div><strong>Terms &amp; Conditions</strong><p>Service scope, customer responsibilities, supplier confirmation and booking conditions.</p><a href="terms.html">Read Terms &amp; Conditions</a></div>
+        </article>
+        <article>
+          <span class="footer-trust-icon" aria-hidden="true">PP</span>
+          <div><strong>Privacy Policy</strong><p>How customer information is collected, protected and used for service processing.</p><a href="privacy.html">Read Privacy Policy</a></div>
+        </article>
+        <article>
+          <span class="footer-trust-icon" aria-hidden="true">RC</span>
+          <div><strong>Refund &amp; Cancellation</strong><p>Cancellation review, supplier conditions and any applicable refund process.</p><a href="refund-policy.html">Read Refund Policy</a></div>
+        </article>
+        <article>
+          <span class="footer-trust-icon" aria-hidden="true">KYC</span>
+          <div><strong>Customer Verification</strong><p>Identification or supporting documents may be requested when required.</p><a href="aml-kyc.html">Read Verification Procedure</a></div>
+        </article>
+      </div>
+    </section>
+
+    <section class="about-ptr" id="company" aria-labelledby="aboutPtrTitle">
+      <div>
+        <p class="eyebrow">About PTR Connect</p>
+        <h2 id="aboutPtrTitle">Travel coordination built around clarity and confidence.</h2>
+        <p>PTR Connect is a Cambodia-based travel and service coordination platform helping customers arrange tours, hotel stays, private transport and related travel services through selected third-party providers.</p>
+        <p>We focus on documented requests, clear service details, supplier confirmation and itemized invoices. Customers review and approve their invoice before continuing to the secure hosted payment page provided by the approved payment partner.</p>
+        <p>PTR Connect does not collect or store card numbers, CVV, PIN or OTP information on this website.</p>
+      </div>
+      <div class="about-ptr-points" aria-label="PTR Connect service principles">
+        <div><strong>Documented Requests</strong><span>Booking and service requirements are recorded for review.</span></div>
+        <div><strong>Confirmed Services</strong><span>Availability and pricing are checked before payment.</span></div>
+        <div><strong>Secure Payment Handoff</strong><span>Approved invoices continue to the payment provider's hosted checkout.</span></div>
+      </div>
     </section>
 
     <footer class="site-footer">
@@ -4096,7 +4198,7 @@ h4 {
         <p>PTR Connect coordinates Cambodia tours, hotel bookings and private transport through selected third-party service providers and itemized invoices.</p>
         <div class="footer-social" aria-label="Contact shortcuts">
           <a href="mailto:info@ptrconnect.online" aria-label="Email PTR Connect">Email</a>
-          <a href="tel:+85586301033" aria-label="Call PTR Connect">Call</a>
+          <a href="tel:+85512766671" aria-label="Call PTR Connect">Call</a>
         </div>
       </div>
       <div class="footer-columns">
@@ -4114,20 +4216,28 @@ h4 {
           <h3>Resources</h3>
           <a href="#process">How It Works</a>
           <a href="payment-policy.html">Payment Policy</a>
-          <a href="terms.html">Terms & Conditions</a>
-          <a href="privacy.html">Privacy Policy</a>
-          <a href="refund-policy.html">Refund & Cancellation</a>
-          <a href="aml-kyc.html">Customer Verification Procedure</a>
+          <a href="#customerPoliciesTitle">Customer Policies</a>
           <a href="#contact">FAQ</a>
         </nav>
         <div class="footer-contact" id="contact" aria-label="Contact us">
           <h3>Contact Us</h3>
-          <p><strong>Email:</strong> info@ptrconnect.online</p>
-          <p><strong>Phone / WhatsApp:</strong> +855 86 301 033</p>
+          <p><strong>Email:</strong> <a href="mailto:info@ptrconnect.online">info@ptrconnect.online</a></p>
+          <p><strong>Phone / WhatsApp:</strong> <a href="tel:+85512766671">+855 12 766 671</a></p>
           <p><strong>Address:</strong> Poipet, Banteay Meanchey, Cambodia</p>
           <p><strong>Working Hours:</strong><br />Mon - Fri: 8:30 AM - 5:30 PM<br />(Saturday: by appointment)</p>
+          <div class="payment-acceptance" aria-label="Accepted secure payment methods">
+            <h4>We Accept Secure Payment</h4>
+            <div class="payment-badges">
+              <span class="payment-badge">ABA PAYWAY</span>
+              <span class="payment-badge khqr">KHQR</span>
+              <span class="payment-badge visa">VISA</span>
+              <span class="payment-badge mastercard">Mastercard</span>
+              <span class="payment-badge unionpay">UnionPay</span>
+              <span class="payment-badge jcb">JCB</span>
+            </div>
+          </div>
         </div>
-        <div class="footer-company" id="company" aria-label="Registered company support">
+        <div class="footer-company" id="company-registration" aria-label="Registered company support">
           <h3>Operated with registered company support from</h3>
           <strong>PRATHNA KASEKOR KHMER IMPORT EXPORT CO., LTD.</strong>
           <p><b>Legal Form:</b> Private Limited Company</p>
@@ -4232,7 +4342,7 @@ const mobileNavigation = document.querySelector("#mobileNavigation");
 const mobileMenuBackdrop = document.querySelector(".mobile-menu-backdrop");
 const feedbackForm = document.querySelector(".feedback-form");
 const feedbackStatus = document.querySelector("#feedbackStatus");
-const adminWhatsAppNumber = "85586301033";
+const adminWhatsAppNumber = "85512766671";
 let invoiceApproved = false;
 let currentServerInvoice = null;
 let paymentStatusTimer = null;
@@ -4470,7 +4580,7 @@ const registeredCompany = {
   registeredDate: "20 May 2025",
   address: "Poipet, Banteay Meanchey, Cambodia",
   addressKhmer: "ក្រុងប៉ោយប៉ែត ខេត្តបន្ទាយមានជ័យ",
-  phone: "+855 86 301 033",
+  phone: "+855 12 766 671",
   email: "info@ptrconnect.online",
   website: "www.ptrconnect.online"
 };
