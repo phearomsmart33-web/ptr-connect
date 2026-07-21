@@ -13,6 +13,7 @@ import time
 from datetime import datetime, timedelta, timezone
 from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
 
+
 from flask import Flask, jsonify, redirect, request
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
@@ -27,6 +28,7 @@ from cryptography.hazmat.primitives.asymmetric import padding as rsa_padding
 from google.auth.transport import requests as google_requests
 from google.oauth2 import id_token
 from sqlalchemy.exc import IntegrityError
+
 
 app = Flask(__name__)
 app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1)
@@ -66,8 +68,35 @@ SERVICE_PRICING = {
     "tour": {"name": "Cambodia Tour Package", "unit_price": Decimal("2500.00"), "fee_rate": Decimal("0.12")},
     "business": {"name": "Business & Local Legal Coordination", "unit_price": Decimal("20000.00"), "fee_rate": Decimal("0.08")},
 }
+# Authoritative catalogue used for new multi-item bookings. Displayed prices on
+# the website and URL parameters are estimates only; this server catalogue is
+# the sole source used to create an invoice and PayWay amount.
+SERVICE_CATALOG = {
+    "royal-heritage": {"name": "Royal Palace Tour", "category": "tour", "unit": "guest", "unit_price": Decimal("85.00")},
+    "phnom-penh-food": {"name": "Phnom Penh Street Food & Cyclo", "category": "tour", "unit": "guest", "unit_price": Decimal("45.00")},
+    "mekong-sunset": {"name": "Mekong Cruise", "category": "tour", "unit": "guest", "unit_price": Decimal("65.00")},
+    "angkor-combo": {"name": "Angkor Explorer Combo", "category": "tour", "unit": "guest", "unit_price": Decimal("150.00")},
+    "hotel-booking": {"name": "Hotel Booking", "category": "hotel", "unit": "room/night", "unit_price": Decimal("120.00")},
+    "private-villa": {"name": "Private Villa", "category": "villa", "unit": "villa/night", "unit_price": Decimal("195.00")},
+    "flight-ticket": {"name": "Flight Ticket", "category": "flight", "unit": "passenger", "unit_price": Decimal("95.00")},
+}
 MONEY_PLACES = Decimal("0.01")
+# PayWay's MDR is a settlement fee between ABA and the merchant. It is never
+# added to the customer's invoice here. Tax is also independent from PayWay;
+# keep it at zero unless the company's tax adviser/accounting configuration
+# explicitly sets a lawful invoice tax rate.
+TAX_RATE = Decimal(os.environ.get("INVOICE_TAX_RATE", "0.00"))
+MAX_PAYWAY_AMOUNT = Decimal(os.environ.get("MAX_PAYWAY_AMOUNT_USD", "5000.00"))
+PAYWAY_METHOD_LIMITS = {
+    "aba_khqr_on_us": Decimal("5000.00"),
+    "aba_khqr_off_us": Decimal("100000.00"),
+    "cards": Decimal("5000.00"),
+    "alipay": Decimal("2500.00"),
+    "wechat": Decimal("2500.00"),
+}
+PAYWAY_SETTLEMENT_DAYS = {"aba_khqr": "instant", "cards": "7 working days"}
 MAX_BOOKING_QUANTITY = 1000
+MAX_BOOKING_ITEMS = 20
 PAYWAY_CREATE_TIMEOUT = (3.05, 8)
 PAYWAY_CHECK_TIMEOUT = (1.0, 1.5)
 PAYWAY_RECHECK_SECONDS = 10
@@ -88,6 +117,7 @@ INVOICE_APPROVED = "APPROVED - PAYMENT PENDING"
 PAYMENT_LINK_READY = "PAYMENT LINK READY"
 PAYMENT_VERIFYING = "PAYMENT VERIFICATION PENDING"
 PAYMENT_PAID = "PAID"
+BOOKING_CONFIRMED = "CONFIRMED"
 LEGACY_APPROVED_STATUS = "APPROVED â€” PAYMENT PENDING"
 LEGACY_APPROVED_STATUSES = {
     LEGACY_APPROVED_STATUS,
@@ -105,8 +135,10 @@ PAYMENT_FLOW_STATUSES = {
 PAYWAY_TRANSACTION_ID_RE = re.compile(r"^[0-9]{1,20}$")
 logger = logging.getLogger(__name__)
 CORS(app, resources={r"/api/*": {"origins": [
-    "https://www.ptrconnect.online", "https://ptrconnect.online"
+    "https://www.ptrconnect.online", "https://ptrconnect.online", "https://booking.ptrconnect.online"
 ]}})
+
+
 
 
 _RATE_LIMIT_BUCKETS = {}
@@ -114,10 +146,14 @@ _RATE_LIMIT_LOCK = threading.Lock()
 _RATE_LIMIT_MAX_BUCKETS = 4096
 
 
+
+
 def _rate_limit_bucket_key(scope, identity):
     """Hash identifiers so raw user, IP and payment references are not retained."""
     digest = hashlib.sha256(str(identity).encode("utf-8")).hexdigest()
     return scope, digest
+
+
 
 
 def _prune_rate_limit_buckets(now_value):
@@ -129,6 +165,8 @@ def _prune_rate_limit_buckets(now_value):
     ]
     for key in stale:
         _RATE_LIMIT_BUCKETS.pop(key, None)
+
+
 
 
 def _rate_limit_response(scope, identity, limit):
@@ -164,6 +202,8 @@ def _rate_limit_response(scope, identity, limit):
     return None
 
 
+
+
 def _client_ip_rate_limit(scope, limit):
     return _rate_limit_response(
         f"{scope}:ip",
@@ -172,8 +212,12 @@ def _client_ip_rate_limit(scope, limit):
     )
 
 
+
+
 def _user_rate_limit(scope, user, limit):
     return _rate_limit_response(f"{scope}:user", f"user:{user.id}", limit)
+
+
 
 
 def _clear_rate_limits_for_testing():
@@ -181,22 +225,28 @@ def _clear_rate_limits_for_testing():
         _RATE_LIMIT_BUCKETS.clear()
 
 
+
+
 def now(): return datetime.now(timezone.utc)
+
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(320), unique=True, nullable=False)
     created_at = db.Column(db.DateTime(timezone=True), default=now, nullable=False)
 
+
 class Session(db.Model):
     token_hash = db.Column(db.String(64), primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id", ondelete="CASCADE"), nullable=False)
     created_at = db.Column(db.DateTime(timezone=True), default=now, nullable=False)
 
+
 class GoogleAuthState(db.Model):
     state = db.Column(db.String(128), primary_key=True)
     nonce = db.Column(db.String(128), nullable=False)
     created_at = db.Column(db.DateTime(timezone=True), default=now, nullable=False)
+
 
 class Booking(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -215,6 +265,7 @@ class Booking(db.Model):
     created_at = db.Column(db.DateTime(timezone=True), default=now, nullable=False)
     updated_at = db.Column(db.DateTime(timezone=True), default=now, onupdate=now, nullable=False)
 
+
 class BookingIdempotency(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id", ondelete="CASCADE"), nullable=False)
@@ -225,6 +276,21 @@ class BookingIdempotency(db.Model):
     __table_args__ = (
         db.UniqueConstraint("user_id", "idempotency_key", name="uq_booking_idempotency_user_key"),
     )
+
+
+class BookingItem(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    booking_id = db.Column(db.Integer, db.ForeignKey("booking.id", ondelete="CASCADE"), nullable=False, index=True)
+    service_id = db.Column(db.String(100), nullable=False)
+    service_name = db.Column(db.String(200), nullable=False)
+    category = db.Column(db.String(40), nullable=False)
+    quantity = db.Column(db.Integer, nullable=False)
+    nights = db.Column(db.Integer, default=1, nullable=False)
+    unit = db.Column(db.String(40), nullable=False)
+    unit_price = db.Column(db.Numeric(12, 2), nullable=False)
+    subtotal = db.Column(db.Numeric(12, 2), nullable=False)
+    options = db.Column(db.JSON, default=dict, nullable=False)
+
 
 class Invoice(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -237,6 +303,19 @@ class Invoice(db.Model):
     payment_link = db.Column(db.Text)
     created_at = db.Column(db.DateTime(timezone=True), default=now, nullable=False)
     updated_at = db.Column(db.DateTime(timezone=True), default=now, onupdate=now, nullable=False)
+
+
+class InvoiceLineItem(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    invoice_id = db.Column(db.Integer, db.ForeignKey("invoice.id", ondelete="CASCADE"), nullable=False, index=True)
+    service_id = db.Column(db.String(100), nullable=False)
+    description = db.Column(db.String(240), nullable=False)
+    quantity = db.Column(db.Integer, nullable=False)
+    nights = db.Column(db.Integer, default=1, nullable=False)
+    unit = db.Column(db.String(40), nullable=False)
+    unit_price = db.Column(db.Numeric(12, 2), nullable=False)
+    subtotal = db.Column(db.Numeric(12, 2), nullable=False)
+
 
 class PaymentAttempt(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -254,10 +333,12 @@ class PaymentAttempt(db.Model):
     created_at = db.Column(db.DateTime(timezone=True), default=now, nullable=False)
     updated_at = db.Column(db.DateTime(timezone=True), default=now, onupdate=now, nullable=False)
 
+
 class PayWayError(Exception):
     def __init__(self, message, code="PAYWAY_ERROR"):
         super().__init__(message)
         self.code = code
+
 
 def money(value):
     if isinstance(value, bool):
@@ -267,15 +348,138 @@ def money(value):
         raise InvalidOperation
     return amount.quantize(MONEY_PLACES, rounding=ROUND_HALF_UP)
 
-def invoice_json(invoice):
+
+def calculate_nights(start_date, end_date):
+    if not start_date or not end_date:
+        return 1
+    try:
+        start = datetime.strptime(str(start_date), "%Y-%m-%d").date()
+        end = datetime.strptime(str(end_date), "%Y-%m-%d").date()
+    except (TypeError, ValueError):
+        raise ValueError("Hotel/villa dates must use YYYY-MM-DD")
+    nights = (end - start).days
+    if not 1 <= nights <= 365:
+        raise ValueError("Check-out must be 1 to 365 nights after check-in")
+    return nights
+
+
+def normalize_booking_items(raw_items):
+    if not isinstance(raw_items, list) or not 1 <= len(raw_items) <= MAX_BOOKING_ITEMS:
+        raise ValueError(f"items must contain 1 to {MAX_BOOKING_ITEMS} services")
+    normalized = []
+    for raw in raw_items:
+        if not isinstance(raw, dict):
+            raise ValueError("Each booking item must be an object")
+        service_id = str(raw.get("serviceId") or "").strip().lower()
+        service = SERVICE_CATALOG.get(service_id)
+        if not service:
+            raise ValueError("Unsupported booking service")
+        quantity_value = raw.get("quantity", 1)
+        if isinstance(quantity_value, bool):
+            raise ValueError("Quantity must be a whole number")
+        try:
+            quantity = int(quantity_value)
+        except (TypeError, ValueError):
+            raise ValueError("Quantity must be a whole number")
+        if str(quantity_value).strip() != str(quantity) or not 1 <= quantity <= MAX_BOOKING_QUANTITY:
+            raise ValueError(f"Quantity must be between 1 and {MAX_BOOKING_QUANTITY}")
+        options = raw.get("options") or {}
+        if not isinstance(options, dict):
+            raise ValueError("Item options must be an object")
+        safe_options = {}
+        for key in ("startDate", "endDate", "route", "roomType", "flightClass"):
+            value = options.get(key)
+            if value not in (None, ""):
+                if not isinstance(value, str) or len(value.strip()) > 200:
+                    raise ValueError(f"Invalid item option: {key}")
+                safe_options[key] = value.strip()
+        nights = 1
+        if service["category"] in {"hotel", "villa"}:
+            nights = calculate_nights(safe_options.get("startDate"), safe_options.get("endDate"))
+        unit_price = money(service["unit_price"])
+        subtotal = money(unit_price * quantity * nights)
+        normalized.append({
+            "serviceId": service_id,
+            "serviceName": service["name"],
+            "category": service["category"],
+            "quantity": quantity,
+            "nights": nights,
+            "unit": service["unit"],
+            "unitPrice": unit_price,
+            "subtotal": subtotal,
+            "options": safe_options,
+        })
+    return normalized
+
+
+def payway_limit_for_method(payment_method=None):
+    method_limit = PAYWAY_METHOD_LIMITS.get(str(payment_method or "").strip().lower())
+    return min(MAX_PAYWAY_AMOUNT, method_limit) if method_limit else MAX_PAYWAY_AMOUNT
+
+
+def validate_payway_total(total, payment_method=None):
+    total = money(total)
+    limit = payway_limit_for_method(payment_method)
+    if total <= Decimal("0.00"):
+        raise ValueError("Invoice total must be positive")
+    if total > limit:
+        raise ValueError(f"Invoice total exceeds the USD {limit:.2f} payment limit")
+    return total
+
+
+def payway_policy_json(total=None):
+    amount = money(total) if total is not None else None
+    method_limits = {key: float(value) for key, value in PAYWAY_METHOD_LIMITS.items()}
+    allowed = None
+    if amount is not None:
+        allowed = [key for key, value in PAYWAY_METHOD_LIMITS.items() if amount <= min(MAX_PAYWAY_AMOUNT, value)]
     return {
+        "currency": "USD",
+        "merchantTransactionLimit": float(MAX_PAYWAY_AMOUNT),
+        "methodLimits": method_limits,
+        "allowedMethodsForAmount": allowed,
+        "settlement": PAYWAY_SETTLEMENT_DAYS,
+        "merchantDiscountRate": {
+            "abaKhqr": "free until further notice",
+            "abaIssuedCards": "free",
+            "nonAbaCards": "3% deducted by ABA during settlement",
+            "chargedToCustomerByBackend": False,
+        },
+        "notes": [
+            "PayWay settles funds under the merchant agreement; the backend does not release or transfer money.",
+            "Settlement status is not customer payment proof; verified Check Transaction data controls PAID status.",
+            "Tax is separate from PayWay fees and is applied only when lawfully configured.",
+        ],
+    }
+
+
+def invoice_json(invoice):
+    lines = InvoiceLineItem.query.filter_by(invoice_id=invoice.id).order_by(InvoiceLineItem.id).all()
+    result = {
         "reference": invoice.reference,
         "status": invoice.status,
         "supplierCost": float(invoice.supplier_cost),
         "serviceFee": float(invoice.service_fee),
+        "subtotal": float(invoice.supplier_cost),
+        "tax": float(invoice.service_fee),
+        "taxRate": float(TAX_RATE),
         "total": float(invoice.total),
         "currency": "USD",
+        "maximumPaywayAmount": float(MAX_PAYWAY_AMOUNT),
+        "paymentPolicy": payway_policy_json(invoice.total),
     }
+    if lines:
+        result["items"] = [{
+            "serviceId": line.service_id,
+            "description": line.description,
+            "quantity": line.quantity,
+            "nights": line.nights,
+            "unit": line.unit,
+            "unitPrice": float(line.unit_price),
+            "subtotal": float(line.subtotal),
+        } for line in lines]
+    return result
+
 
 def payment_json(invoice, attempt):
     result = {
@@ -304,8 +508,10 @@ def payment_json(invoice, attempt):
             pass
     return result
 
+
 def payway_mode():
     return os.environ.get("PAYWAY_MODE", "sandbox").strip().lower()
+
 
 def payway_link_expiry():
     try:
@@ -314,6 +520,7 @@ def payway_link_expiry():
         lifetime = 3600
     lifetime = min(max(lifetime, 300), 86400)
     return int((now() + timedelta(seconds=lifetime)).timestamp())
+
 
 def payway_allowed_link_hosts(mode=None):
     mode = mode or payway_mode()
@@ -328,6 +535,7 @@ def payway_allowed_link_hosts(mode=None):
             hosts.add(hostname)
     return hosts
 
+
 def payway_public_key_source():
     inline_key = os.environ.get("PAYWAY_RSA_PUBLIC_KEY", "").strip()
     if inline_key:
@@ -340,6 +548,7 @@ def payway_public_key_source():
         except OSError as exc:
             raise PayWayError("PayWay public key file could not be read", "PAYWAY_KEY_UNREADABLE") from exc
     raise PayWayError("PayWay RSA public key is not configured", "PAYWAY_KEY_MISSING")
+
 
 def payway_config():
     mode = payway_mode()
@@ -356,6 +565,7 @@ def payway_config():
         "base_url": PAYWAY_BASE_URLS[mode],
     }
 
+
 def payway_is_configured():
     has_key = bool(os.environ.get("PAYWAY_RSA_PUBLIC_KEY", "").strip() or os.environ.get("PAYWAY_RSA_PUBLIC_KEY_PATH", "").strip())
     return bool(
@@ -365,12 +575,15 @@ def payway_is_configured():
         and has_key
     )
 
+
 def payway_request_time():
     return datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S")
+
 
 def payway_hmac(payload, api_key):
     digest = hmac.new(api_key.encode("utf-8"), payload.encode("utf-8"), hashlib.sha512).digest()
     return base64.b64encode(digest).decode("ascii")
+
 
 def encrypt_payway_merchant_auth(data):
     try:
@@ -388,6 +601,7 @@ def encrypt_payway_merchant_auth(data):
         for offset in range(0, len(source), max_chunk)
     )
     return base64.b64encode(encrypted).decode("ascii")
+
 
 def validate_payway_link(link, mode=None):
     try:
@@ -407,6 +621,7 @@ def validate_payway_link(link, mode=None):
     ):
         raise PayWayError("PayWay returned an invalid payment link", "PAYWAY_LINK_INVALID")
     return link
+
 
 def create_payway_payment_link(invoice, booking, merchant_ref_no):
     config = payway_config()
@@ -481,6 +696,7 @@ def create_payway_payment_link(invoice, booking, merchant_ref_no):
         "create_log_id": str(result.get("tran_id") or ""),
     }
 
+
 def check_payway_transaction(tran_id, timeout=PAYWAY_CHECK_TIMEOUT):
     config = payway_config()
     request_time = payway_request_time()
@@ -501,6 +717,7 @@ def check_payway_transaction(tran_id, timeout=PAYWAY_CHECK_TIMEOUT):
     except (requests.RequestException, ValueError) as exc:
         raise PayWayError("PayWay could not verify the transaction", "PAYWAY_VERIFY_UNAVAILABLE") from exc
 
+
 def verify_payway_callback_signature(payload, received_signature):
     config = payway_config()
     concatenated = ""
@@ -514,6 +731,7 @@ def verify_payway_callback_signature(payload, received_signature):
     expected = payway_hmac(concatenated, config["api_key"])
     return hmac.compare_digest(expected, received_signature or "")
 
+
 def payway_callback_signature_required():
     configured = os.environ.get("PAYWAY_REQUIRE_CALLBACK_SIGNATURE")
     if configured is None:
@@ -522,18 +740,22 @@ def payway_callback_signature_required():
         return False
     return configured.strip().lower() in {"1", "true", "yes", "on"}
 
+
 def as_aware_utc(value):
     if value is None:
         return None
     return value if value.tzinfo else value.replace(tzinfo=timezone.utc)
 
+
 def checked_recently(attempt):
     checked_at = as_aware_utc(attempt.last_checked_at)
     return bool(checked_at and (now() - checked_at).total_seconds() < PAYWAY_RECHECK_SECONDS)
 
+
 def payment_link_creation_is_stale(attempt):
     updated_at = as_aware_utc(attempt.updated_at or attempt.created_at)
     return bool(updated_at and (now() - updated_at).total_seconds() >= PAYWAY_CREATE_STALE_SECONDS)
+
 
 def current_user():
     auth = request.headers.get("Authorization", "")
@@ -542,9 +764,11 @@ def current_user():
     session = db.session.get(Session, digest)
     return db.session.get(User, session.user_id) if session else None
 
+
 def require_user():
     user = current_user()
     return user, None if user else (jsonify(error="Authentication required"), 401)
+
 
 @app.get("/api/health")
 def health():
@@ -560,6 +784,19 @@ def health():
         google_auth=bool(os.environ.get("GOOGLE_CLIENT_ID") and os.environ.get("GOOGLE_CLIENT_SECRET")),
     )
 
+
+@app.get("/api/payway/policy")
+def payway_policy():
+    amount_value = request.args.get("amount")
+    try:
+        amount = money(amount_value) if amount_value not in (None, "") else None
+        if amount is not None and amount <= Decimal("0.00"):
+            raise ValueError
+    except (InvalidOperation, TypeError, ValueError):
+        return jsonify(error="amount must be a positive USD value"), 400
+    return jsonify(payway_policy_json(amount)), 200
+
+
 def invoice_for_user(reference, user):
     return (
         db.session.query(Invoice)
@@ -568,13 +805,22 @@ def invoice_for_user(reference, user):
         .first_or_404()
     )
 
+
 def calculate_booking_invoice(booking):
+    booking_items = BookingItem.query.filter_by(booking_id=booking.id).order_by(BookingItem.id).all()
+    if booking_items:
+        subtotal = money(sum((money(item.subtotal) for item in booking_items), Decimal("0.00")))
+        tax = money(subtotal * TAX_RATE)
+        total = validate_payway_total(subtotal + tax)
+        return subtotal, tax, total, booking_items
     pricing = SERVICE_PRICING.get(booking.service)
     if not pricing:
         raise ValueError("Unsupported service")
     supplier = money(pricing["unit_price"] * booking.quantity)
     fee = money(supplier * pricing["fee_rate"])
-    return supplier, fee, money(supplier + fee)
+    total = validate_payway_total(supplier + fee)
+    return supplier, fee, total, []
+
 
 def set_invoice_and_booking_status(invoice, status):
     if invoice.status == PAYMENT_PAID and status != PAYMENT_PAID:
@@ -585,8 +831,9 @@ def set_invoice_and_booking_status(invoice, status):
     # the reconciliation conflict handler.
     with db.session.no_autoflush:
         booking = db.session.get(Booking, invoice.booking_id)
-    if booking and not (booking.status == PAYMENT_PAID and status != PAYMENT_PAID):
-        booking.status = status
+    if booking and not (booking.status == BOOKING_CONFIRMED and status != PAYMENT_PAID):
+        booking.status = BOOKING_CONFIRMED if status == PAYMENT_PAID else status
+
 
 def reconcile_payway_attempt(attempt, candidate_tran_id=None):
     invoice = db.session.get(Invoice, attempt.invoice_id)
@@ -598,6 +845,7 @@ def reconcile_payway_attempt(attempt, candidate_tran_id=None):
         db.session.commit()
         return True
 
+
     tran_id = str(candidate_tran_id or attempt.payway_tran_id or "")
     if not PAYWAY_TRANSACTION_ID_RE.fullmatch(tran_id):
         raise PayWayError("Invalid PayWay transaction identifier", "PAYWAY_TRANSACTION_INVALID")
@@ -606,11 +854,13 @@ def reconcile_payway_attempt(attempt, candidate_tran_id=None):
     if checked_recently(attempt):
         return False
 
+
     attempt.last_checked_at = now()
     if attempt.status != PAYMENT_PAID:
         attempt.status = "VERIFYING"
         set_invoice_and_booking_status(invoice, PAYMENT_VERIFYING)
     db.session.commit()
+
 
     result = check_payway_transaction(tran_id)
     status = result.get("status") if isinstance(result.get("status"), dict) else {}
@@ -624,6 +874,7 @@ def reconcile_payway_attempt(attempt, candidate_tran_id=None):
     except (InvalidOperation, TypeError, ValueError):
         provider_amount = None
 
+
     response_identity_ok = response_tran_id == tran_id
     response_money_ok = (
         provider_amount == money(attempt.amount)
@@ -636,6 +887,7 @@ def reconcile_payway_attempt(attempt, candidate_tran_id=None):
         and str(data.get("payment_status_code")) == "0"
         and provider_payment_status == "APPROVED"
     )
+
 
     def commit_reconciled_state():
         try:
@@ -661,6 +913,7 @@ def reconcile_payway_attempt(attempt, candidate_tran_id=None):
                 db.session.commit()
             return False
 
+
     if approved:
         attempt.payway_tran_id = tran_id
         attempt.status = PAYMENT_PAID
@@ -668,6 +921,7 @@ def reconcile_payway_attempt(attempt, candidate_tran_id=None):
         set_invoice_and_booking_status(invoice, PAYMENT_PAID)
         conflict_result = commit_reconciled_state()
         return True if conflict_result is None else conflict_result
+
 
     # Persist a transaction candidate only after Check Transaction itself
     # confirms its identity, amount and currency. This allows an eventually
@@ -693,11 +947,13 @@ def reconcile_payway_attempt(attempt, candidate_tran_id=None):
     conflict_result = commit_reconciled_state()
     return False if conflict_result is None else conflict_result
 
+
 def issue_session_token(user):
     token = secrets.token_urlsafe(32)
     db.session.add(Session(token_hash=hashlib.sha256(token.encode()).hexdigest(), user_id=user.id))
     db.session.commit()
     return token
+
 
 @app.get("/auth/google")
 def google_login():
@@ -717,6 +973,7 @@ def google_login():
         "prompt": "select_account",
     })
     return redirect("https://accounts.google.com/o/oauth2/v2/auth?" + params)
+
 
 @app.get("/auth/google/callback")
 def google_callback():
@@ -751,9 +1008,41 @@ def google_callback():
     login_token = issue_session_token(user)
     return redirect(f"{FRONTEND_URL}/#auth_token={quote(login_token)}&email={quote(email)}")
 
+
 @app.post("/api/login")
 def login():
     return jsonify(error="Use Sign in with Google"), 410
+
+
+@app.post("/api/bookings/pre-check")
+def booking_pre_check():
+    limited = _client_ip_rate_limit("booking-pre-check", BOOKING_MUTATION_RATE_LIMIT)
+    if limited:
+        return limited
+    data = request.get_json(silent=True)
+    if not isinstance(data, dict):
+        return jsonify(error="A JSON request is required"), 400
+    try:
+        items = normalize_booking_items(data.get("items"))
+        subtotal = money(sum((item["subtotal"] for item in items), Decimal("0.00")))
+        tax = money(subtotal * TAX_RATE)
+        total = money(subtotal + tax)
+    except (InvalidOperation, TypeError, ValueError) as exc:
+        return jsonify(error=str(exc) or "Invalid booking items"), 400
+    return jsonify(
+        items=[{
+            "serviceId": item["serviceId"], "serviceName": item["serviceName"],
+            "category": item["category"], "quantity": item["quantity"],
+            "nights": item["nights"], "unit": item["unit"],
+            "unitPrice": float(item["unitPrice"]), "subtotal": float(item["subtotal"]),
+        } for item in items],
+        subtotal=float(subtotal), tax=float(tax), taxRate=float(TAX_RATE),
+        total=float(total), currency="USD", maximumPaywayAmount=float(MAX_PAYWAY_AMOUNT),
+        withinPaywayLimit=total <= MAX_PAYWAY_AMOUNT,
+        paymentAllowed=Decimal("0.00") < total <= MAX_PAYWAY_AMOUNT,
+        paymentPolicy=payway_policy_json(total),
+    ), 200
+
 
 @app.route("/api/bookings", methods=["GET", "POST"])
 def bookings():
@@ -786,27 +1075,44 @@ def bookings():
             results.append(item)
         return jsonify(bookings=results)
 
+
     data = request.get_json(silent=True)
     if not isinstance(data, dict):
         return jsonify(error="A JSON booking object is required"), 400
 
-    required = ("name", "contact", "service", "startDate", "duration", "quantity")
+
+    raw_items = data.get("items")
+    multi_item_booking = raw_items is not None
+    required = ("name", "contact") if multi_item_booking else ("name", "contact", "service", "startDate", "duration", "quantity")
     if any(key not in data or data[key] in (None, "") for key in required):
         return jsonify(error="Missing required booking fields"), 400
 
-    service = str(data["service"]).strip().lower()
-    if service not in SERVICE_PRICING:
-        return jsonify(error="Unsupported booking service"), 400
-    try:
-        if isinstance(data["quantity"], bool):
-            raise ValueError
-        quantity = int(data["quantity"])
-        if str(data["quantity"]).strip() != str(quantity):
-            raise ValueError
-    except (TypeError, ValueError):
-        return jsonify(error="Quantity must be a whole number"), 400
-    if not 1 <= quantity <= MAX_BOOKING_QUANTITY:
-        return jsonify(error=f"Quantity must be between 1 and {MAX_BOOKING_QUANTITY}"), 400
+    normalized_items = []
+    if multi_item_booking:
+        try:
+            normalized_items = normalize_booking_items(raw_items)
+            booking_subtotal = money(sum((item["subtotal"] for item in normalized_items), Decimal("0.00")))
+            booking_tax = money(booking_subtotal * TAX_RATE)
+            validate_payway_total(booking_subtotal + booking_tax)
+        except (InvalidOperation, TypeError, ValueError) as exc:
+            return jsonify(error=str(exc) or "Invalid booking items"), 400
+        service = normalized_items[0]["serviceId"]
+        quantity = sum(item["quantity"] for item in normalized_items)
+    else:
+        service = str(data["service"]).strip().lower()
+        if service not in SERVICE_PRICING:
+            return jsonify(error="Unsupported booking service"), 400
+        try:
+            if isinstance(data["quantity"], bool):
+                raise ValueError
+            quantity = int(data["quantity"])
+            if str(data["quantity"]).strip() != str(quantity):
+                raise ValueError
+        except (TypeError, ValueError):
+            return jsonify(error="Quantity must be a whole number"), 400
+        if not 1 <= quantity <= MAX_BOOKING_QUANTITY:
+            return jsonify(error=f"Quantity must be between 1 and {MAX_BOOKING_QUANTITY}"), 400
+
 
     def clean_text(key, maximum, required_value=False):
         value = data.get(key, "")
@@ -817,15 +1123,17 @@ def bookings():
             raise ValueError(key)
         return value
 
+
     try:
         customer_name = clean_text("name", 200, True)
         contact = clean_text("contact", 320, True)
-        start_date = clean_text("startDate", 32, True)
-        duration = clean_text("duration", 100, True)
+        start_date = clean_text("startDate", 32, not multi_item_booking)
+        duration = clean_text("duration", 100, not multi_item_booking)
         destination = clean_text("destination", 200)
         details = clean_text("details", 5000)
     except ValueError as exc:
         return jsonify(error=f"Invalid booking field: {exc.args[0]}"), 400
+
 
     extra_services = data.get("extraServices", [])
     if not isinstance(extra_services, list) or len(extra_services) > 20:
@@ -833,6 +1141,7 @@ def bookings():
     if any(not isinstance(item, str) or not item.strip() or len(item.strip()) > 100 for item in extra_services):
         return jsonify(error="Invalid extra service"), 400
     extra_services = [item.strip() for item in extra_services]
+
 
     idempotency_key = request.headers.get("Idempotency-Key", "").strip()
     if idempotency_key and not re.fullmatch(r"[A-Za-z0-9._~:+/=-]{1,128}", idempotency_key):
@@ -847,6 +1156,7 @@ def bookings():
         "quantity": quantity,
         "destination": destination,
         "details": details,
+        "items": [{**item, "unitPrice": str(item["unitPrice"]), "subtotal": str(item["subtotal"])} for item in normalized_items],
     }
     request_fingerprint = hashlib.sha256(
         json.dumps(normalized_request, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode("utf-8")
@@ -863,6 +1173,7 @@ def bookings():
                 return jsonify(reference=existing_booking.reference, status=existing_booking.status), 200
             return jsonify(error="Booking replay record is unavailable"), 409
 
+
     booking = Booking(
         reference="BKG-" + secrets.token_hex(8).upper(),
         user_id=user.id,
@@ -878,8 +1189,21 @@ def bookings():
     )
     db.session.add(booking)
     try:
+        db.session.flush()
+        for item in normalized_items:
+            db.session.add(BookingItem(
+                booking_id=booking.id,
+                service_id=item["serviceId"],
+                service_name=item["serviceName"],
+                category=item["category"],
+                quantity=item["quantity"],
+                nights=item["nights"],
+                unit=item["unit"],
+                unit_price=item["unitPrice"],
+                subtotal=item["subtotal"],
+                options=item["options"],
+            ))
         if idempotency_key:
-            db.session.flush()
             db.session.add(
                 BookingIdempotency(
                     user_id=user.id,
@@ -900,7 +1224,19 @@ def bookings():
                 if existing_booking:
                     return jsonify(reference=existing_booking.reference, status=existing_booking.status), 200
         return jsonify(error="Could not record booking"), 409
-    return jsonify(reference=booking.reference, status=booking.status), 201
+    response = {"reference": booking.reference, "status": booking.status}
+    if normalized_items:
+        subtotal = money(sum((item["subtotal"] for item in normalized_items), Decimal("0.00")))
+        tax = money(subtotal * TAX_RATE)
+        total = money(subtotal + tax)
+        response["estimate"] = {
+            "subtotal": float(subtotal), "tax": float(tax), "taxRate": float(TAX_RATE),
+            "total": float(total), "currency": "USD", "withinPaywayLimit": total <= MAX_PAYWAY_AMOUNT,
+            "maximumPaywayAmount": float(MAX_PAYWAY_AMOUNT),
+            "paymentPolicy": payway_policy_json(total),
+        }
+    return jsonify(response), 201
+
 
 @app.post("/api/bookings/<reference>/invoice")
 def create_invoice(reference):
@@ -918,14 +1254,16 @@ def create_invoice(reference):
     if existing:
         return jsonify(invoice_json(existing)), 200
 
+
     # Client-supplied costs are deliberately ignored. Prices are derived only
     # from the server-maintained service catalogue and stored booking quantity.
     try:
-        supplier, fee, total = calculate_booking_invoice(booking)
+        supplier, fee, total, booking_items = calculate_booking_invoice(booking)
     except (InvalidOperation, TypeError, ValueError):
         return jsonify(error="This booking cannot be invoiced"), 400
     if total <= Decimal("0.00"):
         return jsonify(error="Invoice total must be positive"), 400
+
 
     invoice = Invoice(
         reference="INV-" + secrets.token_hex(8).upper(),
@@ -938,6 +1276,21 @@ def create_invoice(reference):
     booking.status = INVOICE_READY
     db.session.add(invoice)
     try:
+        db.session.flush()
+        for item in booking_items:
+            description = item.service_name
+            if item.nights > 1:
+                description = f"{description} ({item.nights} nights)"
+            db.session.add(InvoiceLineItem(
+                invoice_id=invoice.id,
+                service_id=item.service_id,
+                description=description,
+                quantity=item.quantity,
+                nights=item.nights,
+                unit=item.unit,
+                unit_price=item.unit_price,
+                subtotal=item.subtotal,
+            ))
         db.session.commit()
     except IntegrityError:
         db.session.rollback()
@@ -947,6 +1300,7 @@ def create_invoice(reference):
             return jsonify(error="Could not create invoice"), 409
         return jsonify(invoice_json(invoice)), 200
     return jsonify(invoice_json(invoice)), 201
+
 
 @app.post("/api/invoices/<reference>/approve")
 def approve_invoice(reference):
@@ -969,6 +1323,7 @@ def approve_invoice(reference):
         db.session.commit()
     return jsonify(invoice_json(invoice)), 200
 
+
 @app.post("/api/invoices/<reference>/payment-link")
 def create_invoice_payment_link(reference):
     limited = _client_ip_rate_limit("payment-link", PAYMENT_LINK_RATE_LIMIT)
@@ -983,6 +1338,7 @@ def create_invoice_payment_link(reference):
     invoice = invoice_for_user(reference, user)
     booking = db.session.get(Booking, invoice.booking_id)
     attempt = PaymentAttempt.query.filter_by(invoice_id=invoice.id).first()
+
 
     # A payment link is single-use and single-instance per invoice. Repeated
     # calls return the same stored link and never create a second provider link.
@@ -1006,16 +1362,18 @@ def create_invoice_payment_link(reference):
                 paymentStatus=attempt.status,
             ), 409
 
+
     if not booking or invoice.status not in APPROVED_PAYMENT_STATUSES:
         return jsonify(error="Approve the invoice before creating a payment link"), 409
     try:
-        total = money(invoice.total)
-    except (InvalidOperation, TypeError, ValueError):
+        total = validate_payway_total(invoice.total)
+    except (InvalidOperation, TypeError, ValueError) as exc:
+        if "exceeds" in str(exc):
+            return jsonify(error=str(exc), maximumPaywayAmount=float(MAX_PAYWAY_AMOUNT)), 409
         return jsonify(error="Invoice amount is invalid"), 409
-    if total <= Decimal("0.00"):
-        return jsonify(error="Invoice total must be positive"), 409
     if not payway_is_configured():
         return jsonify(error="PayWay is not configured"), 503
+
 
     if attempt and attempt.status == "CONFIG_ERROR":
         attempt.status = "CREATING"
@@ -1043,6 +1401,7 @@ def create_invoice_payment_link(reference):
             return jsonify(payment_json(invoice, attempt)), 200
         return jsonify(error="Payment link creation is already in progress"), 409
 
+
     try:
         provider = create_payway_payment_link(invoice, booking, attempt.merchant_ref_no)
     except PayWayError as exc:
@@ -1066,6 +1425,7 @@ def create_invoice_payment_link(reference):
         http_status = 503 if exc.code in local_config_errors or exc.code == "PAYWAY_UNAVAILABLE" else 502
         return jsonify(error="PayWay could not create a payment link", code=exc.code), http_status
 
+
     attempt.provider_link_id = provider["provider_link_id"] or None
     # The create-link log/transaction identifier is not a customer payment
     # transaction identifier. They are intentionally stored separately.
@@ -1077,6 +1437,7 @@ def create_invoice_payment_link(reference):
     set_invoice_and_booking_status(invoice, PAYMENT_LINK_READY)
     db.session.commit()
     return jsonify(payment_json(invoice, attempt)), 201
+
 
 @app.get("/api/invoices/<reference>/payment-status")
 def invoice_payment_status(reference):
@@ -1114,6 +1475,7 @@ def invoice_payment_status(reference):
         result["verificationDeferred"] = True
     return jsonify(result), 200
 
+
 @app.post("/api/payments/payway/callback")
 def payway_payment_callback():
     limited = _rate_limit_response(
@@ -1124,14 +1486,17 @@ def payway_payment_callback():
     if limited:
         return limited
 
+
     payload = request.get_json(silent=True)
     if not isinstance(payload, dict):
         return jsonify(error="Invalid callback payload"), 400
+
 
     merchant_ref_no = str(payload.get("merchant_ref_no") or "").strip()
     tran_id = str(payload.get("tran_id") or "").strip()
     if not merchant_ref_no or len(merchant_ref_no) > 50 or not PAYWAY_TRANSACTION_ID_RE.fullmatch(tran_id):
         return jsonify(error="Invalid callback payload"), 400
+
 
     limited = _rate_limit_response(
         "payway-callback:reference",
@@ -1140,6 +1505,7 @@ def payway_payment_callback():
     )
     if limited:
         return limited
+
 
     received_signature = request.headers.get("X-PayWay-HMAC-SHA512", "").strip()
     signature_valid = False
@@ -1152,6 +1518,7 @@ def payway_payment_callback():
             return jsonify(error="Invalid callback signature"), 401
     elif payway_callback_signature_required():
         return jsonify(error="Callback signature is required"), 401
+
 
     # Callback data is only a hint. Unknown references, non-success callback
     # statuses, conflicts and replay bursts are acknowledged without changing
@@ -1172,6 +1539,7 @@ def payway_payment_callback():
     if checked_recently(attempt):
         return jsonify(received=True), 202
 
+
     try:
         # Even a callback with a valid optional signature is only a hint. The
         # candidate is bound, and PAID is set, solely from Check Transaction.
@@ -1181,7 +1549,9 @@ def payway_payment_callback():
         return jsonify(received=True, verification="deferred"), 202
     return jsonify(received=True, paid=paid), 200
 
+
 with app.app_context(): db.create_all()
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", "8000")))
