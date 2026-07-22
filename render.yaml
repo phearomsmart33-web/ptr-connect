@@ -19,6 +19,11 @@ services:
         sync: false
       - key: GOOGLE_CLIENT_SECRET
         sync: false
+      # Keep login, booking and invoice history on the bank-reviewed website origin.
+      - key: FRONTEND_URL
+        value: https://www.ptrconnect.online
+      - key: PAYWAY_RETURN_URL
+        value: https://ptr-connect-api.onrender.com/api/payments/payway/callback
       # Keep Sandbox until ABA approves UAT and issues matched production credentials.
       - key: PAYWAY_MODE
         value: sandbox
