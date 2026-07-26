@@ -55,8 +55,8 @@ google = oauth.register(
     client_kwargs={"scope": "openid email profile"},
 )
 FRONTEND_URL = "https://www.ptrconnect.online"
-PAYWAY_RETURN_URL = "https://ptr-connect-api.onrender.com/api/payments/payway/callback"
-PAYWAY_SUCCESS_URL = "https://booking.ptrconnect.online/?payment=complete"
+PAYWAY_RETURN_URL = "https://www.ptrconnect.online/api/payway/pushback"
+PAYWAY_SUCCESS_URL = "https://www.ptrconnect.online/booking?payment=complete"
 PAYWAY_PURCHASE_PATH = "/api/payment-gateway/v1/payments/purchase"
 PAYWAY_LINK_PATH = "/api/merchant-portal/merchant-access/payment-link/create"
 PAYWAY_CHECK_PATH = "/api/payment-gateway/v1/payments/check-transaction-2"
@@ -137,7 +137,7 @@ PAYMENT_FLOW_STATUSES = {
 PAYWAY_TRANSACTION_ID_RE = re.compile(r"^[0-9]{1,20}$")
 logger = logging.getLogger(__name__)
 CORS(app, resources={r"/api/*": {"origins": [
-    "https://www.ptrconnect.online", "https://ptrconnect.online", "https://booking.ptrconnect.online"
+    "https://www.ptrconnect.online"
 ]}})
 
 
