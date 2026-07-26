@@ -619,7 +619,23 @@ def payway_purchase_hash(fields, api_key):
 
 
 def hosted_checkout_amount(data):
-    package_id = str(data.get("packageId") or "hotel-booking").strip().lower()
+    package_id = str(data.get("packageId") or "").strip().lower()
+    if not package_id:
+        requested_name = re.sub(
+            r"\s+", " ", str(data.get("company") or data.get("package") or "").strip().lower()
+        )
+        package_names = {
+            "royal heritage & silver pagoda": "royal-heritage",
+            "royal palace tour": "royal-heritage",
+            "phnom penh street food & cyclo": "phnom-penh-food",
+            "mekong sunset & island cruise": "mekong-sunset",
+            "mekong cruise": "mekong-sunset",
+            "angkor explorer combo": "angkor-combo",
+            "hotel booking": "hotel-booking",
+            "private villa": "private-villa",
+            "flight ticket": "flight-ticket",
+        }
+        package_id = package_names.get(requested_name, "hotel-booking")
     service = SERVICE_CATALOG.get(package_id)
     if not service:
         raise ValueError("Unsupported booking service")
