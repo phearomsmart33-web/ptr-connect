@@ -1780,7 +1780,11 @@ def payway_payment_callback():
     return jsonify(received=True, paid=paid), 200
 
 
-with app.app_context(): db.create_all()
+with app.app_context():
+    db.create_all()
+    deleted_test_checkouts = HostedCheckout.query.filter_by(booking_id="PKK-0648E2B2745BF446").delete()
+    db.session.commit()
+    app.logger.info("Removed old Sandbox checkout count=%s", deleted_test_checkouts)
 
 
 if __name__ == "__main__":
