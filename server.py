@@ -3,7 +3,7 @@ from collections import deque
 import hashlib
 import hmac
 import json
-        "cancel_url": base64.b64encode(b"https://www.ptrconnect.online/booking").decode("ascii"),
+        
 import logging
 import math
 import os
