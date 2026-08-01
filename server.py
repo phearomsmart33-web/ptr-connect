@@ -3,6 +3,7 @@ from collections import deque
 import hashlib
 import hmac
 import json
+        "cancel_url": base64.b64encode(b"https://www.ptrconnect.online/booking").decode("ascii"),
 import logging
 import math
 import os
@@ -1596,6 +1597,7 @@ def create_hosted_purchase():
         "type": "purchase",
         "payment_option": "",
         "return_url": base64.b64encode(PAYWAY_RETURN_URL.encode("utf-8")).decode("ascii"),
+        "cancel_url": base64.b64encode(b"https://www.ptrconnect.online/booking").decode("ascii"),
         "continue_success_url": PAYWAY_SUCCESS_URL,
         "currency": "USD",
         "return_params": booking_id,
