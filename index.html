@@ -74,16 +74,60 @@
       commons("Siem Reap Art Center Night Market.jpg"),
       photos[21]
     ]);
+    const packageImages=Object.freeze({
+      "royal-heritage":Object.freeze([
+        commons("Royal Palace, Phnom Penh Cambodia 1.jpg"),
+        commons("2016 Phnom Penh, Pałac Królewski, Pawilon Chanchhaya (02).jpg"),
+        commons("2016 Phnom Penh, Pałac Królewski, Preah Tineang Phhochani (14).jpg"),
+        commons("2016 Phnom Penh, Pałac Królewski, Srebrna Pagoda (02).jpg")
+      ]),
+      "phnom-penh-food":Object.freeze([
+        commons("Kabobs at Phnom Penh Night Market.jpg"),
+        commons("Cambodian skewers (23687297234).jpg"),
+        commons("Sugar cane juice in Phnom Penh 3.jpg"),
+        commons("Rickshaw Phnom Penh.JPG")
+      ]),
+      "mekong-sunset":Object.freeze([
+        commons("Sunset at Mekong River.jpg"),
+        commons("20171123 Sunset over Mekong Kratie 3996 DxO.jpg"),
+        commons("Phnom Penh Boat (7251109192).jpg"),
+        commons("20171124 Mekong River Phnom Penh 4205 DxO.jpg")
+      ]),
+      "angkor-combo":Object.freeze([
+        commons("Angkor Wat, Camboya, 2013-08-15, DD 059.JPG"),
+        commons("Bayon, Angkor Thom, Camboya, 2013-08-16, DD 23.jpg"),
+        commons("Ta Phrom, Angkor, Camboya, 2013-08-16, DD 14.JPG"),
+        commons("Banteay Srei full2.jpg")
+      ]),
+      "hotel-booking":Object.freeze([
+        commons("Angkor Heritage Boutique Hotel, Siem Reap, Cambodia.jpg"),
+        commons("Heritage Suites Hotel (5670824210).jpg"),
+        commons("Sokha Phnom Penh Hotel & Residence 001 2015.jpg"),
+        commons("PhnomPenhhotel.jpg")
+      ]),
+      "private-villa":Object.freeze([
+        commons("Sangker Villa Book - 1.jpg"),
+        commons("Sangker Villa Book - 2.jpg"),
+        commons("Reasey Boutique Villa - Swimmingpool and SPA, Siem Reap, Cambodia.jpg"),
+        commons("Reasey Boutique Villa - Swimmingpool and SPA, Siem Reap, Cambodia, Night.jpg")
+      ]),
+      "flight-ticket":Object.freeze([
+        commons("Cambodia Angkor Air at TSN 01.jpg"),
+        commons("Boarding Cambodia Angkor Air VN-A351.jpg"),
+        commons("Kingdom of Cambodia A320 at Phnom Penh airport on 29th September 2015.jpeg"),
+        commons("Phnom Penh International Airport baggage claim in 2025.jpg")
+      ])
+    });
     const tours=Object.freeze([
-      {id:"royal-heritage",name:"Royal Heritage & Silver Pagoda",price:85,duration:"4 hours",tags:["Culture","History"],description:"Explore Phnom Penh's Royal Palace and Silver Pagoda with coordinated service details.",images:photos.slice(4,8)},
-      {id:"phnom-penh-food",name:"Phnom Penh Street Food & Cyclo",price:45,duration:"3 hours",tags:["Food","Local"],description:"Sample Cambodian dishes while exploring Phnom Penh markets and streets.",images:photos.slice(8,12)},
-      {id:"mekong-sunset",name:"Mekong Sunset & Island Cruise",price:65,duration:"4 hours",tags:["Cruise","Sunset"],description:"Request a Mekong sunset cruise and Silk Island coordination, subject to availability.",images:photos.slice(12,16)},
-      {id:"angkor-combo",name:"Angkor Explorer Combo",price:150,duration:"Full day",tags:["Custom","Cambodia"],description:"A tailored full-day itinerary prepared to your dates, group size and supplier availability.",images:photos.slice(16,20)}
+      {id:"royal-heritage",name:"Royal Heritage & Silver Pagoda",price:85,duration:"4 hours",tags:["Culture","History"],description:"Explore Phnom Penh's Royal Palace and Silver Pagoda with coordinated service details.",images:packageImages["royal-heritage"]},
+      {id:"phnom-penh-food",name:"Phnom Penh Street Food & Cyclo",price:45,duration:"3 hours",tags:["Food","Local"],description:"Sample Cambodian dishes while exploring Phnom Penh markets and streets.",images:packageImages["phnom-penh-food"]},
+      {id:"mekong-sunset",name:"Mekong Sunset & Island Cruise",price:65,duration:"4 hours",tags:["Cruise","Sunset"],description:"Request a Mekong sunset cruise and Silk Island coordination, subject to availability.",images:packageImages["mekong-sunset"]},
+      {id:"angkor-combo",name:"Angkor Explorer Combo",price:150,duration:"Full day",tags:["Custom","Cambodia"],description:"A tailored full-day itinerary prepared to your dates, group size and supplier availability.",images:packageImages["angkor-combo"]}
     ]);
     const serviceOptions=Object.freeze([
-      {id:"hotel-booking",name:"Hotel Booking",price:75,unit:"per night",duration:"Request based",tags:["Hotel","Cambodia"],description:"Request a suitable hotel for your destination, dates, room type and guest count. Availability is confirmed before payment.",images:[commons("Angkor Heritage Boutique Hotel, Siem Reap, Cambodia.jpg")]},
-      {id:"private-villa",name:"Private Villa",price:195,unit:"per night",duration:"Request based",tags:["Villa","Private stay"],description:"Request a private villa or bungalow matched to your location, dates, group size and preferred facilities.",images:[commons("Bungalow at Bird of Paradise.jpg")]},
-      {id:"flight-ticket",name:"Flight Ticket",price:95,unit:"per person",duration:"Route based",tags:["Flight","Ticket support"],description:"Send your route, travel date and passenger details. Fare and seat availability are rechecked before payment.",images:[commons("Kingdom of Cambodia A320 at Phnom Penh airport on 29th September 2015.jpeg")]}
+      {id:"hotel-booking",name:"Hotel Booking",price:75,unit:"per night",duration:"Request based",tags:["Hotel","Cambodia"],description:"Request a suitable hotel for your destination, dates, room type and guest count. Availability is confirmed before payment.",images:packageImages["hotel-booking"]},
+      {id:"private-villa",name:"Private Villa",price:195,unit:"per night",duration:"Request based",tags:["Villa","Private stay"],description:"Request a private villa or bungalow matched to your location, dates, group size and preferred facilities.",images:packageImages["private-villa"]},
+      {id:"flight-ticket",name:"Flight Ticket",price:95,unit:"per person",duration:"Route based",tags:["Flight","Ticket support"],description:"Send your route, travel date and passenger details. Fare and seat availability are rechecked before payment.",images:packageImages["flight-ticket"]}
     ]);
     function el(tag,className,text){const node=document.createElement(tag);if(className)node.className=className;if(text!==undefined)node.textContent=text;return node}
     function bookingUrl(tour){const url=new URL(BOOKING_ORIGIN);url.searchParams.set("package",tour.name);url.searchParams.set("packageId",tour.id);url.searchParams.set("price",String(tour.price));return url.href}
