@@ -1596,6 +1596,10 @@ def create_hosted_purchase():
         "lastname": lastname,
         "type": "purchase",
         "payment_option": "",
+        # Required for this merchant profile to return PayWay Hosted Checkout
+        # instead of the raw QR JSON payload. This field is not part of the
+        # Purchase API signature order.
+        "payment_gate": "0",
         "return_url": base64.b64encode(PAYWAY_RETURN_URL.encode("utf-8")).decode("ascii"),
         "cancel_url": base64.b64encode(b"https://www.ptrconnect.online/booking").decode("ascii"),
         "continue_success_url": PAYWAY_SUCCESS_URL,
