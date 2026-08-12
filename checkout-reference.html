@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#12355b">
+  <meta name="color-scheme" content="light">
+  <title>PTR Connect | Checkout Reference</title>
+  <style>
+    :root{--navy:#12355b;--navy-deep:#0d2a49;--blue:#1f6fa9;--sky:#e9f5fb;--ink:#17283b;--muted:#667789;--line:#d8e1e9;--paper:#fff;--wash:#f2f6f8;--green:#149461;--amber:#b86a00;--danger:#b42318;--radius:18px;--shadow:0 12px 34px rgba(18,53,91,.09)}
+    *{box-sizing:border-box}html{background:var(--wash);-webkit-text-size-adjust:100%;text-size-adjust:100%}body{min-width:320px;margin:0;background:var(--wash);color:var(--ink);font-family:"Noto Sans Khmer","Segoe UI",Arial,sans-serif;line-height:1.45}button{font:inherit}button:focus-visible{outline:3px solid #8ad0ff;outline-offset:3px}img{display:block;max-width:100%}
+    .appHeader{min-height:90px;display:flex;align-items:center;gap:15px;padding:12px max(20px,calc((100vw - 1120px)/2));background:var(--paper);border-bottom:1px solid var(--line)}.brandArtwork{width:80px;height:62px;object-fit:contain;flex:0 0 auto}.brandText{min-width:0}.eyebrow{margin:0;color:var(--blue);font-size:10px;font-weight:900;letter-spacing:.14em;overflow-wrap:anywhere}.appHeader h1{margin:2px 0 0;color:var(--navy);font-size:22px;line-height:1.2}.khmer{margin:2px 0 0;color:var(--muted);font-size:12px}.status{display:flex;align-items:center;gap:8px;margin-left:auto;color:#597080;font-size:13px;white-space:nowrap}.status i{width:8px;height:8px;border-radius:50%;background:#21ae72;box-shadow:0 0 0 4px #dff5eb}
+    main{width:min(1120px,calc(100% - 32px));margin:28px auto 60px}.checkoutShell{display:grid;grid-template-columns:minmax(0,1.58fr) minmax(300px,.76fr);overflow:hidden;border:1px solid var(--line);border-radius:var(--radius);background:var(--paper);box-shadow:var(--shadow)}.checkoutContent{min-width:0;padding:clamp(20px,3.2vw,36px)}.panelEyebrow{display:flex;align-items:center;gap:8px;color:var(--green);font-size:11px;font-weight:900;letter-spacing:.12em;text-transform:uppercase}.secureDot{width:8px;height:8px;border-radius:50%;background:#20ad73;box-shadow:0 0 0 4px #ddf6eb}.checkoutContent h2{margin:11px 0 6px;color:var(--navy);font-size:clamp(25px,3vw,32px);letter-spacing:-.025em;line-height:1.15}.checkoutContent>.intro{max-width:640px;margin:0 0 24px;color:var(--muted);font-size:14px}
+    .invoiceStrip{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px 16px;border:1px solid #d5e5ef;border-radius:13px;background:linear-gradient(120deg,#eef8fc,#f9fcfe)}.invoiceStrip>div{min-width:0}.invoiceStrip small,.invoiceStrip b{display:block}.invoiceStrip small{color:#60778a;font-size:10px;font-weight:800;letter-spacing:.09em;text-transform:uppercase}.invoiceStrip b{margin-top:2px;color:var(--navy);font-size:14px;overflow-wrap:anywhere}.invoiceAmount{flex:0 0 auto;text-align:right}.invoiceAmount strong{display:block;margin-top:2px;color:var(--blue);font-size:21px;letter-spacing:-.03em;white-space:nowrap}
+    .methodHeading{display:flex;justify-content:space-between;gap:16px;align-items:flex-end;margin:25px 0 11px}.methodHeading h3{margin:0;color:var(--navy);font-size:14px;letter-spacing:.04em}.methodHeading p{margin:0;color:var(--muted);font-size:11px;text-align:right}.methodList{display:grid;gap:10px}.paymentMethod{width:100%;min-width:0;display:grid;grid-template-columns:54px minmax(0,1fr) auto 18px;gap:13px;align-items:center;padding:12px 14px;border:1px solid #dbe5eb;border-radius:14px;background:#fff;color:var(--ink);text-align:left;cursor:pointer;transition:border-color .18s ease,background .18s ease,box-shadow .18s ease}.paymentMethod:hover{border-color:#83b6d8;background:#fbfdff}.paymentMethod[aria-pressed="true"]{padding:11px 13px;border:2px solid var(--blue);background:#f4faff;box-shadow:0 0 0 3px #dcecf7}.paymentIcon{width:54px;height:44px;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:9px;background:var(--navy);color:#fff;font-size:13px;font-weight:900;line-height:1;letter-spacing:.02em}.paymentIcon small{display:block;margin-top:3px;font-size:7px;font-weight:800;letter-spacing:.05em}.paymentIcon.khqr{background:linear-gradient(135deg,#e92f35,#a70713)}.paymentIcon.card{background:linear-gradient(135deg,#0c6d91,#003c62);font-size:10px}.paymentIcon.alipay{background:#147cdc;font-size:25px}.paymentIcon.wechat{background:#1aae54;font-size:20px}.methodCopy{min-width:0}.methodCopy strong,.methodCopy small{display:block;overflow-wrap:anywhere}.methodCopy strong{color:#18344f;font-size:14px;line-height:1.25}.methodCopy small{margin-top:3px;color:#748494;font-size:11px;line-height:1.35}.methodBadge{border-radius:999px;background:#edf5f0;color:#167450;padding:4px 8px;font-size:9px;font-weight:900;letter-spacing:.04em;white-space:nowrap}.paymentMethod[aria-pressed="false"] .methodBadge{background:#f1f5f7;color:#71808d}.methodArrow{color:#87a0b2;font-size:26px;font-weight:300;line-height:1}.notice{display:flex;gap:10px;margin:17px 0 0;padding:12px 13px;border-left:4px solid var(--blue);border-radius:9px;background:#eef6fb;color:#4a6376;font-size:11px;line-height:1.55}.notice b{color:var(--navy)}
+    .paymentSummary{display:flex;flex-direction:column;min-width:0;padding:clamp(22px,3vw,32px) clamp(20px,2.6vw,28px);background:linear-gradient(155deg,#123f68,#0b2948);color:#fff}.summaryLabel{font-size:10px;font-weight:900;letter-spacing:.14em;text-transform:uppercase;color:#b2d3e8}.paymentSummary>strong{display:block;margin:6px 0 24px;font-size:clamp(28px,3.2vw,36px);letter-spacing:-.045em;line-height:1.1}.summaryRows{display:grid;gap:12px;padding:16px 0;border-top:1px solid rgba(255,255,255,.18);border-bottom:1px solid rgba(255,255,255,.18)}.summaryRows div{display:flex;justify-content:space-between;align-items:baseline;gap:12px}.summaryRows span{color:#b8d2e4;font-size:11px}.summaryRows b{color:#fff;font-size:12px;text-align:right;overflow-wrap:anywhere}.chosenMethod{display:flex!important;align-items:center!important;justify-content:flex-start!important}.chosenMethod .paymentIcon{width:42px;height:36px;flex:0 0 42px;font-size:10px}.chosenMethod .paymentIcon.card{font-size:8px}.chosenMethod .paymentIcon.alipay{font-size:20px}.chosenMethod .paymentIcon.wechat{font-size:16px}.chosenMethod b{font-size:13px}.chosenMethod>span:last-child{min-width:0}.chosenMethod>span:last-child>span,.chosenMethod>span:last-child>b{display:block}.chosenMethod>span:last-child>span{color:#b8d2e4;font-size:11px}.chosenMethod>span:last-child>b{margin-top:2px}.proceed{width:100%;min-height:50px;display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:22px;border:0;border-radius:11px;background:#fff;color:var(--navy);padding:13px 16px;cursor:pointer;box-shadow:0 8px 20px rgba(0,0,0,.16);font-weight:900;transition:transform .18s ease,box-shadow .18s ease}.proceed:hover{transform:translateY(-1px);box-shadow:0 12px 26px rgba(0,0,0,.21)}.proceed b{font-size:21px}.securityNote{margin:15px 0 0;color:#c9deed;font-size:10px;line-height:1.55}.securityNote span{margin-right:4px;color:#6fe0ae;font-size:15px;font-weight:900;vertical-align:-1px}.referenceStatus{min-height:40px;margin-top:14px;border-radius:9px;background:rgba(255,255,255,.1);padding:10px 11px;color:#d9ebf6;font-size:11px;line-height:1.45}.referenceStatus[data-state="ready"]{border:1px solid rgba(111,224,174,.4);background:rgba(20,148,97,.18)}
+    .apiGuide{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:18px}.guideCard{min-width:0;border:1px solid var(--line);border-radius:13px;background:#fff;padding:15px;box-shadow:0 6px 18px rgba(18,53,91,.04)}.guideCard span{display:inline-grid;width:26px;height:26px;place-items:center;border-radius:8px;background:#e5f0f7;color:var(--blue);font-size:11px;font-weight:900}.guideCard h3{margin:9px 0 3px;color:var(--navy);font-size:13px}.guideCard p{margin:0;color:var(--muted);font-size:11px;line-height:1.5;overflow-wrap:anywhere}
+    @media(max-width:900px){.checkoutShell{grid-template-columns:1fr}.paymentSummary{order:-1}.paymentSummary>strong{margin-bottom:18px}.summaryRows{grid-template-columns:1fr 1fr;gap:12px}.chosenMethod{grid-column:1/-1}.apiGuide{grid-template-columns:1fr 1fr}}
+    @media(max-width:620px){.appHeader{min-height:82px;gap:10px;padding:10px 15px}.brandArtwork{width:66px;height:55px}.eyebrow{font-size:9px;letter-spacing:.11em}.appHeader h1{font-size:19px}.status{display:none}main{width:100%;margin:0 0 42px}.checkoutShell{border-right:0;border-left:0;border-radius:0}.checkoutContent{padding:22px 15px}.paymentSummary{padding:23px 15px}.invoiceStrip{align-items:flex-start;flex-direction:column}.invoiceAmount{text-align:left}.methodHeading{align-items:flex-start;flex-direction:column;gap:4px}.methodHeading p{text-align:left}.paymentMethod{grid-template-columns:48px minmax(0,1fr) 16px;gap:10px;padding:11px}.paymentMethod[aria-pressed="true"]{padding:10px}.paymentIcon{width:48px;height:40px}.methodBadge{display:none}.methodCopy strong{font-size:13px}.methodCopy small{font-size:10px}.methodArrow{font-size:23px}.summaryRows{grid-template-columns:1fr}.chosenMethod{grid-column:auto}.apiGuide{grid-template-columns:1fr;margin:16px 15px 0}.notice{font-size:10px}}
+    @media(max-width:360px){.brandArtwork{width:56px}.appHeader h1{font-size:18px}.checkoutContent h2{font-size:24px}.paymentMethod{grid-template-columns:44px minmax(0,1fr) 14px;padding:10px}.paymentIcon{width:44px;height:38px}.methodCopy small{line-height:1.25}}
+    @media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;transition:none!important}}
+  </style>
+</head>
+<body>
+  <header class="appHeader">
+    <img class="brandArtwork" src="assets/prathna-kasekor-khmer-logo.png" alt="PRATHNA KASEKOR KHMER IMPORT EXPORT CO., LTD.">
+    <div class="brandText"><p class="eyebrow">PRATHNA KASEKOR KHMER IMPORT EXPORT CO., LTD.</p><h1>Booking &amp; Invoice</h1><p class="khmer">ប្រព័ន្ធកក់ និងវិក្កយបត្រ</p></div>
+    <span class="status"><i></i>Checkout reference ready</span>
+  </header>
+
+  <main>
+    <section class="checkoutShell" aria-labelledby="checkout-title">
+      <div class="checkoutContent">
+        <div class="panelEyebrow"><span class="secureDot"></span>Secure payment reference</div>
+        <h2 id="checkout-title">Choose a payment method</h2>
+        <p class="intro">Review the confirmed invoice and select a preferred payment method. The selected option will be passed to your approved payment API later.</p>
+        <div class="invoiceStrip" aria-label="Invoice overview"><div><small>Invoice reference</small><b id="invoiceReference">INV-PTR-2026-0001</b><small id="serviceName">Hotel Booking · Deluxe room</small></div><div class="invoiceAmount"><small>Balance due</small><strong id="balanceDue">USD 120.00</strong></div></div>
+        <div class="methodHeading"><h3>PAYMENT METHOD</h3><p>Available options remain subject to merchant configuration.</p></div>
+        <div class="methodList" id="methodList" aria-label="Payment method choices"></div>
+        <div class="notice"><span aria-hidden="true">ⓘ</span><span><b>Important:</b> This UI reference does not collect card data, PINs, or OTP codes. Official payment fields and final available methods must come from the approved hosted checkout.</span></div>
+      </div>
+      <aside class="paymentSummary" aria-label="Selected payment summary">
+        <div class="summaryLabel">Balance due</div>
+        <strong id="summaryAmount">USD 120.00</strong>
+        <div class="summaryRows"><div><span>Invoice</span><b id="summaryInvoice">INV-PTR-2026-0001</b></div><div><span>Service</span><b id="summaryService">Hotel Booking</b></div><div class="chosenMethod"><span class="paymentIcon khqr" id="summaryIcon" aria-hidden="true">ABA<small>KHQR</small></span><span><span>Selected method</span><b id="summaryMethod">ABA KHQR</b></span></div></div>
+        <button class="proceed" type="button" id="continueButton"><span id="continueLabel">Continue with ABA KHQR</span><b aria-hidden="true">→</b></button>
+        <p class="securityNote"><span aria-hidden="true">⌁</span>Your existing API will open the official hosted checkout. Card numbers, PINs, and OTPs are never stored in this UI.</p>
+        <div class="referenceStatus" id="referenceStatus" aria-live="polite">Reference mode: select KHQR or card to preview the UI handoff.</div>
+      </aside>
+    </section>
+
+    <section class="apiGuide" aria-label="API handoff reference">
+      <article class="guideCard"><span>01</span><h3>Invoice data</h3><p>Set invoice ID, service label, and balance through <code>PTRCheckoutReference.setData()</code>.</p></article>
+      <article class="guideCard"><span>02</span><h3>Method choice</h3><p>The UI emits <code>ptr:checkout-method</code> with the selected method ID and invoice data.</p></article>
+      <article class="guideCard"><span>03</span><h3>Safe handoff</h3><p>Connect the continue callback to your approved hosted payment API; do not collect payment credentials here.</p></article>
+    </section>
+  </main>
+
+  <script>
+    "use strict";
+    const state = {
+      invoice: { reference: "INV-PTR-2026-0001", service: "Hotel Booking · Deluxe room", balance: 120 },
+      selected: "aba-khqr"
+    };
+    const methods = Object.freeze([
+      { id: "aba-khqr", name: "ABA KHQR", description: "Scan or pay with the ABA Mobile app", badge: "Recommended", icon: "ABA<small>KHQR</small>", iconClass: "khqr", action: "Continue with ABA KHQR" },
+      { id: "card", name: "Credit / Debit Card", description: "Visa, Mastercard, UnionPay and JCB", badge: "Cards", icon: "CARD<small>VISA · MC</small>", iconClass: "card", action: "Continue with card" },
+      { id: "alipay", name: "Alipay", description: "Pay through an Alipay wallet", badge: "Wallet", icon: "支<small>ALIPAY</small>", iconClass: "alipay", action: "Continue with Alipay" },
+      { id: "wechat", name: "WeChat Pay", description: "Pay through a WeChat wallet", badge: "Wallet", icon: "●<small>WECHAT</small>", iconClass: "wechat", action: "Continue with WeChat Pay" }
+    ]);
+    const money = value => `USD ${Number(value || 0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    const activeMethod = () => methods.find(method => method.id === state.selected) || methods[0];
+    const byId = id => document.getElementById(id);
+
+    function renderMethods() {
+      const list = byId("methodList");
+      list.replaceChildren(...methods.map(method => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "paymentMethod";
+        button.dataset.method = method.id;
+        button.setAttribute("aria-pressed", String(method.id === state.selected));
+        button.innerHTML = `<span class="paymentIcon ${method.iconClass}" aria-hidden="true">${method.icon}</span><span class="methodCopy"><strong>${method.name}</strong><small>${method.description}</small></span><span class="methodBadge">${method.badge}</span><span class="methodArrow" aria-hidden="true">›</span>`;
+        button.addEventListener("click", () => selectMethod(method.id));
+        return button;
+      }));
+    }
+
+    function renderSummary() {
+      const method = activeMethod();
+      const formatted = money(state.invoice.balance);
+      byId("invoiceReference").textContent = state.invoice.reference;
+      byId("serviceName").textContent = state.invoice.service;
+      byId("balanceDue").textContent = formatted;
+      byId("summaryAmount").textContent = formatted;
+      byId("summaryInvoice").textContent = state.invoice.reference;
+      byId("summaryService").textContent = state.invoice.service.split(" · ")[0];
+      byId("summaryIcon").className = `paymentIcon ${method.iconClass}`;
+      byId("summaryIcon").innerHTML = method.icon;
+      byId("summaryMethod").textContent = method.name;
+      byId("continueLabel").textContent = method.action;
+    }
+
+    function selectMethod(id) {
+      if (!methods.some(method => method.id === id)) return;
+      state.selected = id;
+      renderMethods();
+      renderSummary();
+      window.dispatchEvent(new CustomEvent("ptr:checkout-method", { detail: { method: activeMethod(), invoice: { ...state.invoice } } }));
+    }
+
+    function setData(data = {}) {
+      state.invoice = { ...state.invoice, ...data };
+      if (data.method && methods.some(method => method.id === data.method)) state.selected = data.method;
+      renderMethods();
+      renderSummary();
+    }
+
+    byId("continueButton").addEventListener("click", () => {
+      const method = activeMethod();
+      const status = byId("referenceStatus");
+      status.dataset.state = "ready";
+      status.textContent = `${method.name} selected. Reference handoff is ready for your approved payment API; no payment was submitted.`;
+      window.dispatchEvent(new CustomEvent("ptr:checkout-continue", { detail: { method, invoice: { ...state.invoice } } }));
+    });
+
+    window.PTRCheckoutReference = Object.freeze({ setData, getData: () => ({ invoice: { ...state.invoice }, method: activeMethod() }) });
+    renderMethods();
+    renderSummary();
+  </script>
+</body>
+</html>
