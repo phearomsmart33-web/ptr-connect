@@ -47,40 +47,281 @@
   <script>
     "use strict";
     const state = { invoice: { reference: "INV-PTR-2026-0001", service: "Hotel Booking · Deluxe room", balance: 120 }, method: "aba-khqr" };
-    const methods = Object.freeze([
-  { 
-    id: "aba-khqr", 
-    name: "ABA KHQR", 
-    description: "Scan to pay with any banking app", 
-    icon: '<img src="aba_selector_assets/aba_khqr.png" alt="ABA KHQR">', 
-    iconClass: "khqr", 
-    action: "Continue with ABA KHQR" 
-  },
-  { 
-    id: "card", 
-    name: "Credit / Debit Card", 
-    description: "Visa, Mastercard, UnionPay and JCB", 
-    icon: '<img src="aba_selector_assets/card_icon.png" alt="Credit and debit card">', 
-    iconClass: "card", 
-    action: "Continue with card" 
-  },
-  { 
-    id: "alipay", 
-    name: "Alipay", 
-    description: "Scan to pay with Alipay", 
-    icon: '<img src="aba_selector_assets/alipay.png" alt="Alipay">', 
-    iconClass: "alipay", 
-    action: "Continue with Alipay" 
-  },
-  { 
-    id: "wechat", 
-    name: "WeChat", 
-    description: "Scan to pay with WeChat", 
-    icon: '<img src="aba_selector_assets/wechat.png" alt="WeChat">', 
-    iconClass: "wechat", 
-    action: "Continue with WeChat Pay" 
-  }
-]);
+    <!DOCTYPE html>
+<html lang="km">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ABA Pay Checkout Component</title>
+  <style>
+    /* Global Base */
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: #f8fafc;
+      padding: 24px;
+      color: #1e293b;
+    }
+
+    /* ១. HEADER BRAND SECTION */
+    .header-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .header-brand .brand-logo {
+      height: 36px;
+      width: auto;
+      object-fit: contain;
+    }
+
+    .header-brand .brand-text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .header-brand .brand-text .title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #0f172a;
+      line-height: 1.2;
+    }
+
+    .header-brand .brand-text .subtitle {
+      font-size: 12px;
+      color: #64748b;
+    }
+
+    /* ២. PAYMENT OPTION CONTAINER */
+    .payment-option {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 16px;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      background-color: #ffffff;
+      margin-bottom: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease-in-out;
+    }
+
+    .payment-option:hover {
+      border-color: #00bcd4;
+    }
+
+    .payment-option.selected {
+      border-color: #00bcd4;
+      background-color: #f4fbfd;
+      box-shadow: 0 0 0 1px #00bcd4;
+    }
+
+    /* Custom Radio Input Alignment */
+    .payment-option input[type="radio"] {
+      margin-top: 3px;
+      accent-color: #00bcd4;
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+    }
+
+    .option-content {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .option-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .option-info {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .option-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #0f172a;
+    }
+
+    .option-desc {
+      font-size: 12px;
+      color: #64748b;
+      margin-top: 2px;
+    }
+
+    /* LOGOS STYLING */
+    .khqr-logo, .wallet-logo {
+      height: 22px;
+      width: auto;
+      object-fit: contain;
+    }
+
+    /* FLEX ROW FOR CREDIT CARDS */
+    .card-logos-flex {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .card-logos-flex img {
+      height: 20px;
+      width: 32px;
+      object-fit: contain;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 4px;
+      padding: 2px;
+    }
+  </style>
+</head>
+<body> 
+  <!-- 1. HEADER SECTION LOGO -->
+  <div class="header-brand">
+    <img src="https://checkout.payway.com.kh/images/aba-logo.svg" alt="ABA Pay Logo" class="brand-logo" />
+    <div class="brand-text">
+      <span class="title">ABA Pay</span>
+      <span class="subtitle">Secure Payment Gateway</span>
+    </div>
+  </div>
+  <!-- 2. PAYMENT METHOD 1: ABA Pay KHQR -->
+  <label class="payment-option">
+    <input type="radio" name="payment_method" value="khqr" />
+    <div class="option-content">
+      <div class="option-left">
+        <img src="https://khqr.bakong.nbc.gov.kh/assets/images/khqr-logo.svg" alt="KHQR Logo" class="khqr-logo" />
+        <div class="option-info">
+          <span class="option-title">ABA Pay KHQR</span>
+          <span class="option-desc">Scan QR code with your banking app</span>
+        </div>
+      </div>
+    </div>
+  </label>
+  <!-- 3. PAYMENT METHOD 2: Credit/Debit Card -->
+  <label class="payment-option selected">
+    <input type="radio" name="payment_method" value="card" checked />
+    <div class="option-content">
+      <div class="option-left">
+        <div class="option-info">
+          <span class="option-title">Credit/Debit Card</span>
+          <span class="option-desc">Visa, Mastercard, UnionPay, JCB supported</span>
+        </div>
+      </div>
+      <div class="card-logos-flex">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" alt="Visa" />
+        <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard" />
+        <img src="https://upload.wikimedia.org/wikipedia/commons/1/1b/UnionPay_logo.svg" alt="UnionPay" />
+        <img src="https://upload.wikimedia.org/wikipedia/commons/4/40/JCB_logo.svg" alt="JCB" />
+      </div>
+    </div>
+  </label>
+  <!-- 4. PAYMENT METHOD 3: Alipay -->
+  <label class="payment-option">
+    <input type="radio" name="payment_method" value="alipay" />
+    <div class="option-content">
+      <div class="option-left">
+        <img src="aba_selector_assets/alipay.png" alt="Alipay Logo" class="wallet-logo" />
+        <div class="option-info">
+          <span class="option-title">Alipay</span>
+          <span class="option-desc">Scan to pay with Alipay</span>
+        </div>
+      </div>
+    </div>
+  </label>
+  <!-- 5. PAYMENT METHOD 4: WeChat Pay -->
+  <label class="payment-option">
+    <input type="radio" name="payment_method" value="wechat" />
+    <div class="option-content">
+      <div class="option-left">
+        <img src="aba_selector_assets/wechat.png" alt="WeChat Logo" class="wallet-logo" />
+        <div class="option-info">
+          <span class="option-title">WeChat Pay</span>
+          <span class="option-desc">Scan to pay with WeChat Pay</span>
+        </div>
+      </div>
+    </div>
+  </label>
+</body>
+</html>
+  <!-- 1. HEADER SECTION LOGO -->
+  <div class="header-brand">
+    <img src="https://checkout.payway.com.kh/images/aba-logo.svg" alt="ABA Pay Logo" class="brand-logo" />
+    <div class="brand-text">
+      <span class="title">ABA Pay</span>
+      <span class="subtitle">Secure Payment Gateway</span>
+    </div>
+  </div>
+
+  <!-- 2. PAYMENT METHOD 1: ABA Pay KHQR -->
+  <label class="payment-option">
+    <input type="radio" name="payment_method" value="khqr" />
+    <div class="option-content">
+      <div class="option-left">
+        <img src="https://khqr.bakong.nbc.gov.kh/assets/images/khqr-logo.svg" alt="KHQR Logo" class="khqr-logo" />
+        <div class="option-info">
+          <span class="option-title">ABA Pay KHQR</span>
+          <span class="option-desc">Scan QR code with your banking app</span>
+        </div>
+      </div>
+    </div>
+  </label>
+
+  <!-- 3. PAYMENT METHOD 2: Credit/Debit Card -->
+  <label class="payment-option selected">
+    <input type="radio" name="payment_method" value="card" checked />
+    <div class="option-content">
+      <div class="option-left">
+        <div class="option-info">
+          <span class="option-title">Credit/Debit Card</span>
+          <span class="option-desc">Visa, Mastercard, UnionPay, JCB supported</span>
+        </div>
+      </div>
+      <div class="card-logos-flex">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" alt="Visa" />
+        <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard" />
+        <img src="https://upload.wikimedia.org/wikipedia/commons/1/1b/UnionPay_logo.svg" alt="UnionPay" />
+        <img src="https://upload.wikimedia.org/wikipedia/commons/4/40/JCB_logo.svg" alt="JCB" />
+      </div>
+    </div>
+  </label>
+
+  <!-- 4. PAYMENT METHOD 3: Alipay -->
+  <label class="payment-option">
+    <input type="radio" name="payment_method" value="alipay" />
+    <div class="option-content">
+      <div class="option-left">
+        <img src="aba_selector_assets/alipay.png" alt="Alipay Logo" class="wallet-logo" />
+        <div class="option-info">
+          <span class="option-title">Alipay</span>
+          <span class="option-desc">Scan to pay with Alipay</span>
+        </div>
+      </div>
+    </div>
+  </label>
+
+  <!-- 5. PAYMENT METHOD 4: WeChat Pay -->
+  <label class="payment-option">
+    <input type="radio" name="payment_method" value="wechat" />
+    <div class="option-content">
+      <div class="option-left">
+        <img src="aba_selector_assets/wechat.png" alt="WeChat Logo" class="wallet-logo" />
+        <div class="option-info">
+          <span class="option-title">WeChat Pay</span>
+          <span class="option-desc">Scan to pay with WeChat Pay</span>
+        </div>
+      </div>
+    </div>
+  </label>
+
+</html>]);
     const id = value => document.getElementById(value);
     const money = value => `USD ${Number(value || 0).toLocaleString("en-US", { minimumFractionDigits:2, maximumFractionDigits:2 })}`;
     const current = () => methods.find(method => method.id === state.method) || methods[0];
