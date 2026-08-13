@@ -48,10 +48,11 @@
     "use strict";
     const state = { invoice: { reference: "INV-PTR-2026-0001", service: "Hotel Booking · Deluxe room", balance: 120 }, method: "aba-khqr" };
     const methods = Object.freeze([
-      { id:"aba-khqr", name:"ABA KHQR", description:"Scan to pay with any banking app", icon:"ABA<small>KHQR</small>", iconClass:"khqr", action:"Continue with ABA KHQR" },
-      { id:"card", name:"Credit / Debit Card", description:"Visa, Mastercard, UnionPay and JCB", icon:"CARD<small>VISA · MC</small>", iconClass:"card", action:"Continue with card" },
-      { id:"alipay", name:"Alipay", description:"Scan to pay with Alipay", icon:"支<small>ALIPAY</small>", iconClass:"alipay", action:"Continue with Alipay" },
-      { id:"wechat", name:"WeChat Pay", description:"Scan to pay with WeChat", icon:"●<small>WECHAT</small>", iconClass:"wechat", action:"Continue with WeChat Pay" }
+  { id: "aba-khqr", name: "ABA KHQR", description: "Scan to pay with any banking app", icon: "ABA<small>KHQR</small>", iconClass: "khqr", action: "Continue with ABA KHQR" },
+  { id: "card", name: "Credit / Debit Card", description: "Visa, Mastercard, UnionPay and JCB", icon: "CARD<small>VISA · MC</small>", iconClass: "card", action: "Continue with card" },
+  { id: "alipay", name: "Alipay", description: "Scan to pay with Alipay", icon: "支<small>ALIPAY</small>", iconClass: "alipay", action: "Continue with Alipay" },
+  { id: "wechat", name: "WeChat", description: "Scan to pay with WeChat", icon: "•<small>WECHAT</small>", iconClass: "wechat", action: "Continue with WeChat Pay" }
+]);
     ]);
     const id = value => document.getElementById(value);
     const money = value => `USD ${Number(value || 0).toLocaleString("en-US", { minimumFractionDigits:2, maximumFractionDigits:2 })}`;
