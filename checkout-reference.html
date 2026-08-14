@@ -6,58 +6,71 @@
 <title>PTR Connect — ABA Payment Selector UI</title>
 <style>
 :root{
-  --ink:#081B37;
-  --muted:#697386;
-  --soft:#F2F3F7;
-  --border:#E2E8F0;
-  --page:#F6F8FB;
+  --ink:#17233a;
+  --muted:#728096;
+  --soft:#f1f4f8;
+  --border:#e7ebf0;
+  --page:#eef4f8;
+  --selected:#00a7bd;
 }
 *{box-sizing:border-box}
 body{
   margin:0;
   background:var(--page);
   color:var(--ink);
-  font-family:"SF Pro Display","Segoe UI",Arial,sans-serif;
+  font-family:Inter,"SF Pro Text","Segoe UI",Arial,sans-serif;
+  -webkit-font-smoothing:antialiased;
 }
 .wrap{
-  width:min(100% - 24px, 590px);
-  margin:32px auto;
+  width:min(calc(100% - 24px), 390px);
+  margin:24px auto;
+  padding:12px;
+  border:1px solid #dce5eb;
+  border-radius:14px;
+  background:#f7fafc;
+  box-shadow:0 8px 24px rgba(23,49,77,.08);
 }
 .title{
-  font-size:22px;
-  font-weight:700;
-  margin:0 0 14px;
+  margin:0 2px 10px;
+  color:#3f4d60;
+  font-size:12px;
+  font-weight:600;
 }
 .selector{
   display:flex;
   flex-direction:column;
-  gap:10px;
+  gap:7px;
 }
 .method{
   width:100%;
-  min-height:124px;
+  min-height:64px;
   display:grid;
-  grid-template-columns:84px minmax(0,1fr) 44px;
+  grid-template-columns:44px minmax(0,1fr) 28px;
   align-items:center;
-  gap:18px;
-  padding:16px 20px;
+  gap:10px;
+  padding:8px 10px;
   background:#fff;
   border:1px solid var(--border);
-  border-radius:18px;
-  box-shadow:0 2px 8px rgba(8,27,55,.08);
+  border-radius:10px;
+  box-shadow:0 2px 7px rgba(24,45,70,.07);
   text-align:left;
   color:inherit;
   cursor:pointer;
+  transition:border-color .15s ease,box-shadow .15s ease,transform .15s ease;
+}
+.method:hover{
+  border-color:#cdd8e2;
+  transform:translateY(-1px);
 }
 .method[aria-pressed="true"]{
-  box-shadow:0 0 0 2px rgba(0,103,131,.22),0 2px 8px rgba(8,27,55,.08);
+  border-color:#b9e1e7;
+  box-shadow:0 0 0 1px rgba(0,167,189,.16),0 2px 7px rgba(24,45,70,.07);
 }
 .icon{
-  width:84px;
-  height:84px;
+  width:44px;
+  height:44px;
   display:grid;
   place-items:center;
-  flex:none;
 }
 .icon img{
   max-width:100%;
@@ -72,58 +85,46 @@ body{
 }
 .copy b{
   display:block;
-  font-size:23px;
-  line-height:1.15;
+  font-size:13px;
+  line-height:1.2;
   font-weight:700;
-  letter-spacing:-.2px;
+  letter-spacing:-.08px;
 }
 .copy p{
-  margin:6px 0 0;
-  font-size:18px;
+  margin:3px 0 0;
+  font-size:10px;
   line-height:1.25;
   color:var(--muted);
 }
 .brands{
-  margin-top:7px;
+  display:block;
+  margin-top:4px;
 }
 .brands img{
-  height:28px;
+  height:14px;
   width:auto;
   max-width:100%;
   object-fit:contain;
   display:block;
 }
 .arrow{
-  width:40px;
-  height:40px;
+  width:26px;
+  height:26px;
   display:grid;
   place-items:center;
   background:var(--soft);
-  border-radius:8px;
-  color:#535362;
-  font-size:34px;
+  border-radius:7px;
+  color:#536174;
+  font-size:20px;
   line-height:1;
-  font-weight:400;
+  font-weight:500;
 }
 .note{
-  margin:14px 2px 0;
-  font-size:12px;
-  color:var(--muted);
+  display:none;
 }
 @media(max-width:560px){
-  .wrap{width:100%;margin:0;padding:10px}
-  .method{
-    min-height:96px;
-    grid-template-columns:64px minmax(0,1fr) 36px;
-    gap:12px;
-    padding:12px 14px;
-    border-radius:14px;
-  }
-  .icon{width:64px;height:64px}
-  .copy b{font-size:17px}
-  .copy p{font-size:14px;margin-top:3px}
-  .brands img{height:20px}
-  .arrow{width:34px;height:34px;font-size:28px}
+  body{background:#f7fafc}
+  .wrap{width:100%;margin:0;padding:10px;border:0;border-radius:0;box-shadow:none}
 }
 </style>
 </head>
