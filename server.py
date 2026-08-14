@@ -97,6 +97,7 @@ PAYWAY_METHOD_LIMITS = {
     "alipay": Decimal("2500.00"),
     "wechat": Decimal("2500.00"),
 }
+PAYWAY_HOSTED_PAYMENT_OPTIONS = frozenset({"abapay_khqr", "cards", "alipay", "wechat"})
 PAYWAY_SETTLEMENT_DAYS = {"aba_khqr": "instant", "cards": "7 working days"}
 MAX_BOOKING_QUANTITY = 1000
 MAX_BOOKING_ITEMS = 20
@@ -1561,6 +1562,9 @@ def create_hosted_purchase():
     request_id = request.headers.get("Idempotency-Key", "").strip()
     if not re.fullmatch(r"[A-Za-z0-9._~-]{16,128}", request_id):
         return jsonify(message="A valid booking request identifier is required."), 400
+    payment_option = str(data.get("paymentOption") or "").strip().lower()
+    if payment_option not in PAYWAY_HOSTED_PAYMENT_OPTIONS:
+        return jsonify(message="A supported payment option is required."), 400
     existing = HostedCheckout.query.filter_by(request_id=request_id).first()
     if existing:
         if existing.status in {"PAID", "CONFIRMED", "CANCELLED"}:
@@ -1595,7 +1599,7 @@ def create_hosted_purchase():
         "firstname": firstname,
         "lastname": lastname,
         "type": "purchase",
-        "payment_option": "",
+        "payment_option": payment_option,
         # Required for this merchant profile to return PayWay Hosted Checkout
         # instead of the raw QR JSON payload. This field is not part of the
         # Purchase API signature order.
