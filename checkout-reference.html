@@ -22,33 +22,33 @@ body{
   -webkit-font-smoothing:antialiased;
 }
 .wrap{
-  width:min(calc(100% - 24px), 390px);
-  margin:24px auto;
-  padding:12px;
+  width:min(calc(100% - 20px), 310px);
+  margin:20px auto;
+  padding:8px;
   border:1px solid #dce5eb;
   border-radius:14px;
   background:#f7fafc;
   box-shadow:0 8px 24px rgba(23,49,77,.08);
 }
 .title{
-  margin:0 2px 10px;
+  margin:0 2px 8px;
   color:#3f4d60;
-  font-size:12px;
+  font-size:11px;
   font-weight:600;
 }
 .selector{
   display:flex;
   flex-direction:column;
-  gap:7px;
+  gap:6px;
 }
 .method{
   width:100%;
-  min-height:64px;
+  min-height:56px;
   display:grid;
-  grid-template-columns:44px minmax(0,1fr) 28px;
+  grid-template-columns:36px minmax(0,1fr) 24px;
   align-items:center;
-  gap:10px;
-  padding:8px 10px;
+  gap:8px;
+  padding:6px 8px;
   background:#fff;
   border:1px solid var(--border);
   border-radius:10px;
@@ -63,12 +63,12 @@ body{
   transform:translateY(-1px);
 }
 .method[aria-pressed="true"]{
-  border-color:#b9e1e7;
-  box-shadow:0 0 0 1px rgba(0,167,189,.16),0 2px 7px rgba(24,45,70,.07);
+  border-color:var(--border);
+  box-shadow:0 2px 7px rgba(24,45,70,.07);
 }
 .icon{
-  width:44px;
-  height:44px;
+  width:36px;
+  height:36px;
   display:grid;
   place-items:center;
 }
@@ -85,14 +85,14 @@ body{
 }
 .copy b{
   display:block;
-  font-size:13px;
+  font-size:11px;
   line-height:1.2;
   font-weight:700;
   letter-spacing:-.08px;
 }
 .copy p{
   margin:3px 0 0;
-  font-size:10px;
+  font-size:8.5px;
   line-height:1.25;
   color:var(--muted);
 }
@@ -101,21 +101,21 @@ body{
   margin-top:4px;
 }
 .brands img{
-  height:14px;
+  height:12px;
   width:auto;
   max-width:100%;
   object-fit:contain;
   display:block;
 }
 .arrow{
-  width:26px;
-  height:26px;
+  width:22px;
+  height:22px;
   display:grid;
   place-items:center;
   background:var(--soft);
-  border-radius:7px;
+  border-radius:6px;
   color:#536174;
-  font-size:20px;
+  font-size:17px;
   line-height:1;
   font-weight:500;
 }
@@ -124,7 +124,7 @@ body{
 }
 @media(max-width:560px){
   body{background:#f7fafc}
-  .wrap{width:100%;margin:0;padding:10px;border:0;border-radius:0;box-shadow:none}
+  .wrap{width:100%;max-width:310px;margin:0 auto;padding:8px;border:0;border-radius:0;box-shadow:none}
 }
 </style>
 </head>
