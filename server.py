@@ -57,7 +57,7 @@ google = oauth.register(
 )
 FRONTEND_URL = "https://www.ptrconnect.online"
 PAYWAY_RETURN_URL = "https://www.ptrconnect.online/api/payway/pushback"
-PAYWAY_SUCCESS_URL = "https://www.ptrconnect.online/booking?payment=complete"
+PAYWAY_SUCCESS_URL = "https://www.ptrconnect.online/"
 PAYWAY_PURCHASE_PATH = "/api/payment-gateway/v1/payments/purchase"
 PAYWAY_LINK_PATH = "/api/merchant-portal/merchant-access/payment-link/create"
 PAYWAY_CHECK_PATH = "/api/payment-gateway/v1/payments/check-transaction-2"
@@ -97,7 +97,7 @@ PAYWAY_METHOD_LIMITS = {
     "alipay": Decimal("2500.00"),
     "wechat": Decimal("2500.00"),
 }
-PAYWAY_HOSTED_PAYMENT_OPTIONS = frozenset({"abapay_khqr", "cards", "alipay", "wechat"})
+PAYWAY_HOSTED_PAYMENT_OPTIONS = frozenset({"abapay_khqr", "cards"})
 PAYWAY_SETTLEMENT_DAYS = {"aba_khqr": "instant", "cards": "7 working days"}
 MAX_BOOKING_QUANTITY = 1000
 MAX_BOOKING_ITEMS = 20
@@ -1600,10 +1600,6 @@ def create_hosted_purchase():
         "lastname": lastname,
         "type": "purchase",
         "payment_option": payment_option,
-        # Required for this merchant profile to return PayWay Hosted Checkout
-        # instead of the raw QR JSON payload. This field is not part of the
-        # Purchase API signature order.
-        "payment_gate": "0",
         "return_url": base64.b64encode(PAYWAY_RETURN_URL.encode("utf-8")).decode("ascii"),
         "cancel_url": base64.b64encode(b"https://www.ptrconnect.online/booking").decode("ascii"),
         "continue_success_url": PAYWAY_SUCCESS_URL,
