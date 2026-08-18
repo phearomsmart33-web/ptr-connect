@@ -63,7 +63,7 @@ PAYWAY_LINK_PATH = "/api/merchant-portal/merchant-access/payment-link/create"
 PAYWAY_CHECK_PATH = "/api/payment-gateway/v1/payments/check-transaction-2"
 PAYWAY_BASE_URLS = {
     "sandbox": "https://checkout-sandbox.payway.com.kh",
-    "production": "https://checkout.payway.com.kh",
+    "production": "https://payway.com.kh",
 }
 SERVICE_PRICING = {
     "hotel": {"name": "5-Star Hotel Booking", "unit_price": Decimal("700.00"), "fee_rate": Decimal("0.10")},
