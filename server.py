@@ -1421,7 +1421,17 @@ def create_invoice_payment_link(reference):
         if attempt.status == PAYMENT_PAID or invoice.status == PAYMENT_PAID:
             return jsonify(payment_json(invoice, attempt)), 200
         if attempt.payment_link and attempt.status in {"LINK_READY", "PENDING", "VERIFYING"}:
-            return jsonify(payment_json(invoice, attempt)), 200
+            try:
+                validate_payway_link(attempt.payment_link, payway_mode())
+            except PayWayError:
+                attempt.payment_link = None
+                attempt.provider_link_id = None
+                attempt.create_log_id = None
+                attempt.status = "CONFIG_ERROR"
+                attempt.error_code = "PAYWAY_LINK_ENV_MISMATCH"
+                db.session.commit()
+            else:
+                return jsonify(payment_json(invoice, attempt)), 200
         if attempt.status == "CREATING":
             if payment_link_creation_is_stale(attempt):
                 # The provider may have created a link before our process lost
@@ -1473,7 +1483,17 @@ def create_invoice_payment_link(reference):
         db.session.rollback()
         attempt = PaymentAttempt.query.filter_by(invoice_id=invoice.id).first()
         if attempt and attempt.payment_link:
-            return jsonify(payment_json(invoice, attempt)), 200
+            try:
+                validate_payway_link(attempt.payment_link, payway_mode())
+            except PayWayError:
+                attempt.payment_link = None
+                attempt.provider_link_id = None
+                attempt.create_log_id = None
+                attempt.status = "CONFIG_ERROR"
+                attempt.error_code = "PAYWAY_LINK_ENV_MISMATCH"
+                db.session.commit()
+            else:
+                return jsonify(payment_json(invoice, attempt)), 200
         return jsonify(error="Payment link creation is already in progress"), 409
 
 
